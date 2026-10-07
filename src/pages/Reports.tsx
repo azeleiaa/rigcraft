@@ -1,0 +1,18 @@
+import { monthlySalesData, paymentMethods, reportStats, salesPerformance } from '../data/dummyData'
+import { downloadCsv, Icon, PanelHeader } from '../components/DashboardUI'
+
+export default function Reports() {
+  const highestMonth = Math.max(...monthlySalesData.map((month) => month.value))
+
+  return (
+    <div className="page-stack">
+      <div className="page-toolbar report-toolbar"><p className="eyebrow">PERIODE LAPORAN</p><button className="btn btn-outline" type="button"><Icon name="calendar" /> Apr – Sep 2026</button><button className="btn btn-primary" type="button" onClick={() => downloadCsv('rigcraft-laporan.csv', [['Ringkasan', 'Nilai'], ...reportStats.map((stat) => [stat.label, stat.value]), [], ['Produk', 'Unit terjual', 'Pendapatan', 'Tren'], ...salesPerformance.map((item) => [item.product, item.sold, item.revenue, item.trend])])}><Icon name="download" /> Unduh laporan</button></div>
+      <section className="stats-grid report-stats">{reportStats.map((stat) => <article className="stat-card" key={stat.label}><p className="stat-card-label">{stat.label}</p><p className="stat-card-value">{stat.value}</p><p className={`stat-card-change ${stat.changeType}`}><Icon name="trend" /> {stat.change}<span>{stat.changeLabel}</span></p></article>)}</section>
+      <div className="content-grid-equal">
+        <section className="card"><PanelHeader title="Pertumbuhan pendapatan" note="Perbandingan pendapatan bulanan" /><div className="report-chart-legend"><span><i /> Pendapatan</span><strong>Rp 487,5 jt <small>September</small></strong></div><div className="bar-chart month-chart report-chart" role="img" aria-label="Grafik pendapatan April sampai September 2026">{monthlySalesData.map((month, index) => <div className="bar-chart-item" key={month.month}><span className="bar-chart-value">{Math.round(month.value / 1_000_000)} jt</span><div className={`bar-chart-bar ${index === monthlySalesData.length - 1 ? 'is-current' : ''}`} style={{ height: `${(month.value / highestMonth) * 100}%` }} /><span className="bar-chart-label">{month.month}</span></div>)}</div></section>
+        <section className="card"><PanelHeader title="Metode pembayaran" note="Distribusi transaksi berdasarkan metode" /><div className="payment-list">{paymentMethods.map((method) => <div className="payment-item" key={method.name}><div className="payment-item-header"><span className="payment-item-label">{method.name}</span><span className="payment-item-value">{method.percentage}%</span></div><div className="payment-bar"><div className="payment-bar-fill" style={{ width: `${method.percentage}%`, background: method.color }} /></div></div>)}</div><div className="payment-footnote"><span>Metode paling populer</span><strong>Transfer Bank <b>45%</b></strong></div></section>
+      </div>
+      <section className="card"><PanelHeader title="Performa produk" note="Produk dengan kontribusi penjualan tertinggi" /><div className="table-scroll"><table className="data-table"><thead><tr><th>Produk</th><th>Unit terjual</th><th>Pendapatan</th><th>Tren</th></tr></thead><tbody>{salesPerformance.map((item, index) => <tr key={item.product}><td><div className="product-table-name"><span className="product-rank">0{index + 1}</span><span className="cell-primary">{item.product}</span></div></td><td>{item.sold} unit</td><td className="price">{item.revenue}</td><td><span className={`trend-label ${item.trend}`}>{item.trend === 'up' ? '↗ Naik' : item.trend === 'down' ? '↘ Turun' : '— Stabil'}</span></td></tr>)}</tbody></table></div></section>
+    </div>
+  )
+}
