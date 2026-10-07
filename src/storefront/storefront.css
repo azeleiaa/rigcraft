@@ -1036,3 +1036,66 @@ body {
 .sf-filter-panel .sf-filter-help { font-size: 14px; }
 .sf-filter-panel .sf-filter-help a { font-size: 14px; }
 .sf-filter-panel .sf-filter-help .sf-icon { width: 22px; height: 22px; }
+
+/* ===== Checkout: semua teks lebih besar ===== */
+.sf-flow-page .sf-eyebrow { font-size: 13px; }
+.sf-flow-heading h1 { font-size: 44px; }
+
+/* stepper */
+.sf-checkout-progress { font-size: 13px; gap: 14px; }
+.sf-checkout-progress i { width: 28px; height: 28px; font-size: 12px; }
+.sf-checkout-progress > b { width: 40px; }
+
+/* layout: kotak ringkasan kanan lebih lebar */
+.sf-checkout-layout { grid-template-columns: minmax(0, 1fr) 440px; gap: 24px; }
+.sf-checkout-forms { gap: 18px; }
+
+/* panel form */
+.sf-form-panel { padding: 24px; border-radius: 12px; }
+.sf-form-panel-heading { margin-bottom: 18px; padding-bottom: 14px; }
+.sf-form-panel-heading h2 { font-size: 20px; }
+.sf-form-panel-heading > span { font-size: 14px; }
+
+/* kolom isian */
+.sf-checkout-fields { gap: 16px 20px; }
+.sf-checkout-fields > label { font-size: 14px; gap: 8px; }
+.sf-checkout-fields input,
+.sf-checkout-fields textarea,
+.sf-checkout-fields select {
+  min-height: 48px;
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+/* pilihan pengiriman & pembayaran */
+.sf-choice-list { gap: 12px; }
+.sf-choice-row { padding: 18px 20px; gap: 16px; border-radius: 10px; }
+.sf-choice-row input { width: 20px; height: 20px; }
+.sf-choice-copy strong { font-size: 16px; }
+.sf-choice-copy small { font-size: 13px; line-height: 1.5; }
+.sf-choice-row > b { font-size: 13px; white-space: nowrap; }
+
+/* ringkasan pesanan */
+.sf-checkout-summary { padding: 28px; }
+.sf-checkout-summary h2 { font-size: 22px; }
+.sf-checkout-item { gap: 14px; }
+.sf-checkout-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+.sf-checkout-item strong { font-size: 15px; }
+.sf-checkout-item small { font-size: 13px; }
+.sf-checkout-item > b { font-size: 15px; }
+.sf-checkout-summary > p { font-size: 15px; }
+.sf-checkout-summary > p strong { font-size: 16px; }
+.sf-checkout-summary .sf-total-row span { font-size: 17px; }
+.sf-checkout-summary .sf-total-row strong { font-size: 28px; }
+.sf-checkout-summary .sf-summary-button {
+  width: 100%;
+  min-height: 62px;
+  font-size: 16px;
+}
+.sf-secure-note { font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 1100px) {
+  .sf-checkout-layout { grid-template-columns: 1fr; }
+  .sf-flow-heading h1 { font-size: 34px; }
+}
