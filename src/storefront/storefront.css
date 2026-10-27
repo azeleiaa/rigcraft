@@ -1255,3 +1255,29 @@ body {
   .sf-bigsearch input { font-size: 15px; }
   .sf-bigsearch-clear { width: 30px; height: 30px; border-radius: 8px; font-size: 12px; }
 }
+
+/* ── Cart Badge ─────────────────────────────── */
+.sf-cart-link {
+  position: relative;
+}
+.sf-cart-badge {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--sf-cyan);
+  color: #050510;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+  animation: badge-pop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes badge-pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

@@ -42,6 +42,7 @@ function BrandMark() {
 function StoreHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const { count } = useStoreCart()
   useEffect(() => setMenuOpen(false), [location.pathname])
 
   const links = [
@@ -63,7 +64,7 @@ function StoreHeader() {
         <div className="sf-header-actions">
           <Link className="sf-sign-in" to="/masuk">Masuk</Link>
           <Link className="sf-button sf-button-small" to="/daftar">Daftar</Link>
-          <Link className="sf-cart-link" to="/keranjang" aria-label="Keranjang belanja"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="21" r="1" /><circle cx="18" cy="21" r="1" /></svg><span>Keranjang</span></Link>
+          <Link className="sf-cart-link" to="/keranjang" aria-label="Keranjang belanja"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="21" r="1" /><circle cx="18" cy="21" r="1" /></svg><span>Keranjang</span>{count > 0 && <span className="sf-cart-badge" aria-label={`${count} item`}>{count > 99 ? '99+' : count}</span>}</Link>
         </div>
       </div>
     </header>

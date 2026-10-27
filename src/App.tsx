@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import AdminLayout from './components/Layout/AdminLayout'
 import Dashboard from './pages/Dashboard'
 import Orders from './pages/Orders'
@@ -17,6 +17,13 @@ import Checkout from './pages/storefront/Checkout'
 import Auth from './pages/storefront/Auth'
 import About from './pages/storefront/About'
 
+function RequireAdminAuth() {
+  const location = useLocation()
+  const isAuth = window.localStorage.getItem('rigcraft-auth') === 'true'
+  if (!isAuth) return <Navigate to="/masuk" state={{ from: location.pathname }} replace />
+  return <Outlet />
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -34,14 +41,16 @@ function App() {
           <Route path="/daftar" element={<Auth />} />
           <Route path="/tentang" element={<About />} />
         </Route>
-        <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
-        <Route element={<AdminLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/pesanan" element={<Orders />} />
-          <Route path="/produk" element={<Products />} />
-          <Route path="/pelanggan" element={<Customers />} />
-          <Route path="/laporan" element={<Reports />} />
-          <Route path="/pengaturan" element={<Settings />} />
+        <Route element={<RequireAdminAuth />}>
+          <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
+          <Route element={<AdminLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/pesanan" element={<Orders />} />
+            <Route path="/produk" element={<Products />} />
+            <Route path="/pelanggan" element={<Customers />} />
+            <Route path="/laporan" element={<Reports />} />
+            <Route path="/pengaturan" element={<Settings />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

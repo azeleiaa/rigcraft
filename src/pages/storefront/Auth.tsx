@@ -3,7 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { StoreIcon } from '../../storefront/StorefrontUI'
 
 export default function Auth() {
-  const isRegister = useLocation().pathname === '/daftar'
+  const location = useLocation()
+  const isRegister = location.pathname === '/daftar'
+  const from = (location.state as { from?: string } | null)?.from ?? '/'
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
@@ -16,8 +18,9 @@ export default function Auth() {
       setNotice('Konfirmasi password belum sama.')
       return
     }
+    window.localStorage.setItem('rigcraft-auth', 'true')
     setNotice(isRegister ? 'Akun demo berhasil dibuat. Selamat datang di RigCraft!' : 'Login demo berhasil. Selamat datang kembali!')
-    window.setTimeout(() => navigate('/'), 1200)
+    window.setTimeout(() => navigate(from), 1200)
   }
 
   return (
