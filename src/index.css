@@ -2582,6 +2582,239 @@ table {
   .save-feedback {
     max-width: 130px;
   }
+
+  .donut-chart-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .donut-chart {
+    width: 120px;
+    height: 120px;
+  }
+
+  .donut-chart-center .value {
+    font-size: 20px;
+  }
+
+  .donut-legend {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .donut-legend-item {
+    font-size: 11px;
+  }
+
+  .report-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-chart {
+    height: 170px;
+  }
+
+  .report-chart-legend {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .payment-list {
+    gap: 13px;
+  }
+
+  .payment-item-label,
+  .payment-item-value {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .main-content {
+    padding: 10px;
+  }
+
+  .page-stack {
+    gap: 11px;
+  }
+
+  .header {
+    padding-right: 10px;
+    padding-left: 10px;
+    gap: 8px;
+  }
+
+  .header-title h1 {
+    font-size: 17px;
+  }
+
+  .header-notification {
+    width: 33px;
+    height: 33px;
+  }
+
+  .header-notification-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+    top: -3px;
+    right: -3px;
+  }
+
+  .stats-grid,
+  .customer-stats,
+  .report-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-card-value {
+    font-size: 17px;
+  }
+
+  .stat-card-label {
+    font-size: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+  }
+
+  .card {
+    padding: 12px 10px;
+  }
+
+  .card-title {
+    font-size: 13px;
+  }
+
+  .chart-summary strong {
+    font-size: 17px;
+  }
+
+  .month-chart {
+    height: 160px;
+    gap: 5px;
+  }
+
+  .month-chart .bar-chart-value,
+  .month-chart .bar-chart-label {
+    font-size: 8px;
+  }
+
+  .dashboard-intro {
+    min-height: 40px;
+  }
+
+  .dashboard-intro .btn {
+    min-height: 30px;
+    font-size: 10px;
+    padding: 6px 10px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+  }
+
+  .intro-copy {
+    font-size: 11px;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .product-card-image {
+    height: 140px;
+  }
+
+  .product-card-name {
+    min-height: auto;
+    font-size: 12px;
+  }
+
+  .product-card-price {
+    font-size: 13px;
+  }
+
+  .tab-bar {
+    gap: 6px;
+  }
+
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .btn {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .pagination-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .filter-tab {
+    padding: 5px 9px;
+    font-size: 10px;
+  }
+
+  .form-grid {
+    gap: 10px;
+  }
+
+  .form-grid label {
+    font-size: 10px;
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .settings-section {
+    padding: 14px 11px;
+  }
+
+  .setting-option {
+    gap: 12px;
+    padding: 11px 0;
+  }
+
+  .setting-option strong {
+    font-size: 11px;
+  }
+
+  .setting-option small {
+    font-size: 10px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
