@@ -164,7 +164,8 @@
 .sidebar-user-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 50%; /* allowed avatar exception */
+  border-radius: 50%;
+  /* allowed avatar exception */
   background: var(--bg);
   border: 1px solid var(--border);
   color: var(--text);
@@ -249,11 +250,15 @@
   display: flex;
   align-items: center;
   gap: var(--s2);
+  flex-shrink: 0;
 }
 
 .header-search {
   position: relative;
-  width: 260px;
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 
 .header-search svg {
@@ -265,26 +270,38 @@
   height: 14px;
   stroke: var(--text-muted);
   fill: none;
+  pointer-events: none;
 }
 
 .header-search input {
-  padding-left: 32px !important;
+  width: 100%;
   height: 34px;
+  padding: 6px 12px 6px 32px !important;
   font-size: 12px;
   background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  box-sizing: border-box;
 }
 
 .header-notification {
   position: relative;
   width: 34px;
   height: 34px;
-  display: grid;
-  place-items: center;
+  min-width: 34px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text);
   cursor: pointer;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
   transition: border-color var(--transition);
 }
 
@@ -807,7 +824,8 @@
 .customer-avatar {
   width: 28px;
   height: 28px;
-  border-radius: 50%; /* allowed avatar exception */
+  border-radius: 50%;
+  /* allowed avatar exception */
   background: var(--bg);
   border: 1px solid var(--border);
   display: grid;
@@ -1104,6 +1122,7 @@
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
   .content-grid {
     grid-template-columns: 1fr;
   }
@@ -1180,6 +1199,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
