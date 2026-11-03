@@ -12,8 +12,10 @@
   --border: #2A2C31;
   --text: #E8E6E1;
   --text-muted: #9A9893;
-  --accent: #FF5A1F;
+  --accent: #4C8DFF;
+  --accent-hover: #6BA0FF;
   --accent-text: #0E0F11;
+  --accent-muted: rgba(76, 141, 255, 0.15);
 
   /* Typography */
   --font-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -32,7 +34,7 @@
   --s6: 48px;
   --s8: 64px;
 
-  /* Functional Status Colors (Muted, transparent bg, 1px border - Orange never used for status) */
+  /* Functional status colors stay separate from the accent. */
   --status-success: #34D399;
   --status-success-bg: rgba(52, 211, 153, 0.08);
   --status-success-border: rgba(52, 211, 153, 0.28);
@@ -65,9 +67,9 @@
   --bg-hover: rgba(255, 255, 255, 0.035);
 
   --accent-cyan: var(--accent);
-  --accent-cyan-hover: #ff723b;
-  --accent-cyan-10: rgba(255, 90, 31, 0.1);
-  --accent-cyan-20: rgba(255, 90, 31, 0.2);
+  --accent-cyan-hover: var(--accent-hover);
+  --accent-cyan-10: color-mix(in srgb, var(--accent) 10%, transparent);
+  --accent-cyan-20: color-mix(in srgb, var(--accent) 20%, transparent);
   --accent-purple: var(--text-muted);
   --accent-magenta: var(--text-muted);
 
