@@ -1,6 +1,6 @@
 /* ==========================================================================
    RigCraft - Industrial Specification Storefront Stylesheet (Dark Mode)
-   Single Accent Color: Orange (#FF5A1F)
+  Single Accent Color: Blue (#4C8DFF)
    Zero Shadows, Zero Gradients, Sharp 1px Lines, 3px Corner Radius
    ========================================================================== */
 
@@ -12,7 +12,7 @@
   --sf-line: var(--border);
   --sf-line-cyan: var(--border);
   --sf-cyan: var(--accent);
-  --sf-cyan-soft: rgba(255, 90, 31, 0.08);
+  --sf-cyan-soft: var(--accent-muted);
   --sf-text: var(--text);
   --sf-muted: var(--text-muted);
   --sf-dim: var(--text-muted);
@@ -429,8 +429,8 @@
 .sf-featured-tag {
   right: auto;
   left: 6px;
-  background: rgba(255, 90, 31, 0.08);
-  border-color: rgba(255, 90, 31, 0.28);
+  background: var(--accent-muted);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
   color: var(--accent);
 }
 
