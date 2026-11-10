@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { builderComponents, formatRupiah } from '../../storefront/data'
 import type { StoreProduct } from '../../storefront/data'
@@ -26,6 +26,24 @@ export default function Builder() {
   const { addToCart } = useStoreCart()
   const navigate = useNavigate()
 
+  useLayoutEffect(() => {
+    const page = document.querySelector<HTMLElement>('.sf-builder-page')
+    const header = document.querySelector<HTMLElement>('.sf-header')
+    const status = page?.querySelector<HTMLElement>('.sf-builder-status')
+    if (!page || !header || !status) return
+
+    const updateStickyHeights = () => {
+      page.style.setProperty('--nav-h', `${header.getBoundingClientRect().height}px`)
+      page.style.setProperty('--bar-h', `${status.getBoundingClientRect().height}px`)
+    }
+    const observer = new ResizeObserver(updateStickyHeights)
+    observer.observe(header)
+    observer.observe(status)
+    updateStickyHeights()
+
+    return () => observer.disconnect()
+  }, [])
+
   const selectedCount = Object.values(selected).filter((value) => value !== null).length
   const selectedOptions = builderComponents.map((component) => ({ component, option: selected[component.id] === null ? undefined : component.options[selected[component.id] ?? 0] }))
   const componentTotal = selectedOptions.reduce((total, item) => total + (item.option?.price ?? 0), 0)
@@ -38,6 +56,15 @@ export default function Builder() {
   const supply = Number(power?.socket.replace('W', '') ?? 0)
   const recommendedSupply = Math.max(550, Math.ceil((estimatedPower + 100) / 50) * 50)
   const powerWarning = Boolean(power && supply < recommendedSupply)
+
+  const hasIssues = socketsMismatch || powerWarning
+  const statusMessage = socketsMismatch
+    ? 'Soket processor tidak cocok dengan motherboard.'
+    : powerWarning
+      ? `Daya PSU di bawah rekomendasi minimum ${recommendedSupply}W.`
+      : selectedCount === builderComponents.length
+        ? 'Semua komponen yang dipilih berfungsi bersama.'
+        : 'Komponen yang dipilih sejauh ini kompatibel.'
 
   function choose(id: string, index: number | null) {
     setSelected((current) => ({ ...current, [id]: index }))
@@ -61,16 +88,22 @@ export default function Builder() {
         <p>Pilih komponen komputer custom di bawah ini. Sistem kami akan otomatis memverifikasi kompatibilitas soket, daya PSU, serta dimensi casing secara real-time.</p>
       </div>
 
-      <div className="sf-builder-status">
-        <span className={`sf-compatibility ${socketsMismatch ? 'is-warning' : 'is-valid'}`}>
-          <StoreIcon name={socketsMismatch ? 'spark' : 'check'} /> {socketsMismatch ? 'Perlu Penyesuaian' : 'Kompatibel'}
-        </span>
-        <span>{socketsMismatch ? 'Soket processor tidak cocok dengan motherboard.' : 'Semua komponen yang dipilih saat ini berfungsi bersama.'}</span>
-        <div>
-          <small>Estimasi Daya Total</small>
-          <strong>{estimatedPower}W <i>/ {recommendedSupply}W PSU</i></strong>
+      <div className={`sf-builder-status ${hasIssues ? 'is-warning' : 'is-valid'}`}>
+        <div className="sf-status-state">
+          <span className={`sf-compatibility ${hasIssues ? 'is-warning' : 'is-valid'}`}>
+            <StoreIcon name={hasIssues ? 'spark' : 'check'} /> {hasIssues ? 'Perlu Penyesuaian' : 'Kompatibel'}
+          </span>
+          <span className="sf-status-message">{statusMessage}</span>
         </div>
-        <div className="sf-power-meter"><span style={{ width: `${Math.min((estimatedPower / recommendedSupply) * 100, 100)}%` }} /></div>
+        <div className="sf-status-power">
+          <div className="sf-status-power-copy">
+            <small>Estimasi Daya</small>
+            <strong>{estimatedPower}W <i>/ {recommendedSupply}W PSU</i></strong>
+          </div>
+          <div className={`sf-power-meter ${powerWarning ? 'is-warning' : ''}`}>
+            <span style={{ width: `${Math.min((estimatedPower / recommendedSupply) * 100, 100)}%` }} />
+          </div>
+        </div>
         <div className="sf-build-total">
           <small>Total Rakitan</small>
           <strong>{formatRupiah(total)}</strong>

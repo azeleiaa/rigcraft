@@ -295,5 +295,5 @@ export const paymentMethods = [
   { name: 'Transfer Bank', percentage: 45, color: '#00E5FF' },
   { name: 'E-Wallet', percentage: 32, color: '#3B82F6' },
   { name: 'Kartu Kredit', percentage: 18, color: '#EF4444' },
-  { name: 'COD', percentage: 5, color: '#F59E0B' },
+  { name: 'COD', percentage: 5, color: 'var(--accent)' },
 ];

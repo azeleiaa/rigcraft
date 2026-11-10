@@ -1,0 +1,510 @@
+/* ==========================================================================
+   RigCraft - Industrial Specification Shared Components
+   Buttons, Inputs, Tables, Cards, Modals, Tabs, Badges, Pagination, Icons
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Buttons (.btn, .sf-button, .sf-icon-add, etc.)
+   -------------------------------------------------------------------------- */
+.btn,
+.sf-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s1);
+  padding: 8px 18px;
+  min-height: 38px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--transition), border-color var(--transition), filter var(--transition), color var(--transition);
+  box-shadow: none !important;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Primary Button: Accent Background, Dark Text */
+.btn-primary,
+.sf-button:not(.sf-button-outline) {
+  background: var(--accent) !important;
+  color: var(--accent-text) !important;
+  border-color: var(--accent) !important;
+}
+
+.btn-primary:hover,
+.sf-button:not(.sf-button-outline):hover {
+  filter: brightness(1.1);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Outline / Secondary Button */
+.btn-outline,
+.sf-button.sf-button-outline {
+  background: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  font-weight: 600;
+}
+
+.btn-outline:hover,
+.sf-button.sf-button-outline:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Danger Button */
+.btn-danger {
+  background: transparent !important;
+  border: 1px solid var(--status-danger-border) !important;
+  color: var(--status-danger) !important;
+}
+
+.btn-danger:hover {
+  background: var(--status-danger-bg) !important;
+}
+
+/* Small Buttons */
+.btn-small,
+.sf-button-small {
+  min-height: 30px;
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
+/* Disabled */
+.btn:disabled,
+.sf-button:disabled,
+.sf-button[disabled],
+.btn.disabled,
+.sf-button.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: none !important;
+}
+
+/* Icon-only button (.sf-icon-add, .action-icon, .product-card-action-btn) */
+.sf-icon-add,
+.action-icon,
+.product-card-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  box-shadow: none !important;
+}
+
+.sf-icon-add {
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.sf-icon-add:hover {
+  filter: brightness(1.1);
+  transform: none !important;
+}
+
+.action-icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  color: var(--text-muted);
+}
+
+.action-icon:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.product-card-action-btn {
+  width: 32px;
+  height: 32px;
+  color: var(--text-muted);
+}
+
+.product-card-action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   2. Form Controls (Input, Select, Textarea, Checkbox)
+   -------------------------------------------------------------------------- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--transition);
+  box-shadow: none !important;
+  appearance: auto;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+/* Custom form grid labels */
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   3. Cards & Panels (.card, .stat-card, etc.)
+   -------------------------------------------------------------------------- */
+.card,
+.stat-card,
+.sf-form-panel,
+.sf-auth-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none !important;
+  position: relative;
+}
+
+.card {
+  padding: var(--s3);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-bottom: var(--s2);
+  padding-bottom: var(--s1);
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin: 0 0 2px 0;
+  line-height: 1.2;
+}
+
+.card-subtitle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   4. Data Tables (.data-table, .table-scroll, .table-card)
+   -------------------------------------------------------------------------- */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.data-table th {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.data-table tr {
+  transition: background var(--transition);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.data-table td.price,
+.data-table td.order-id,
+.data-table .cell-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th:has(+ th[aria-label="Aksi"]),
+.data-table td:nth-last-child(2) {
+  /* keep alignment clean */
+}
+
+/* --------------------------------------------------------------------------
+   5. Status Badges (.badge, .sf-product-status, .sf-featured-tag)
+   -------------------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: var(--radius) !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: transparent !important;
+  border: 1px solid transparent;
+}
+
+.badge-success {
+  color: var(--status-success) !important;
+  border-color: var(--status-success-border) !important;
+  background: var(--status-success-bg) !important;
+}
+
+.badge-warning {
+  color: var(--status-warning) !important;
+  border-color: var(--status-warning-border) !important;
+  background: var(--status-warning-bg) !important;
+}
+
+.badge-danger {
+  color: var(--status-danger) !important;
+  border-color: var(--status-danger-border) !important;
+  background: var(--status-danger-bg) !important;
+}
+
+.badge-info,
+.badge-process {
+  color: var(--status-info) !important;
+  border-color: var(--status-info-border) !important;
+  background: var(--status-info-bg) !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. Tabs & Filters (.filter-tabs, .filter-tab, .tab-bar, .sf-segmented)
+   -------------------------------------------------------------------------- */
+.filter-tabs,
+.tab-bar,
+.sf-segmented {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  flex-wrap: wrap;
+}
+
+.filter-tab,
+.tab-btn,
+.sf-segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.filter-tab:hover,
+.tab-btn:hover,
+.sf-segmented button:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.filter-tab.active,
+.filter-tab[aria-selected="true"],
+.tab-btn.active,
+.sf-segmented button.is-active,
+.sf-segmented button[aria-selected="true"] {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: var(--accent-muted) !important;
+}
+
+.filter-tab .count,
+.tab-btn .count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--radius);
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.filter-tab.active .count {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* --------------------------------------------------------------------------
+   7. Pagination (.pagination, .pagination-btn, .sf-pagination)
+   -------------------------------------------------------------------------- */
+.pagination,
+.sf-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-top: var(--s3);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.pagination-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pagination-btn,
+.sf-pagination button {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.pagination-btn:hover:not(.disabled):not(:disabled),
+.sf-pagination button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pagination-btn.active,
+.sf-pagination button.is-active {
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
+  color: var(--accent-text) !important;
+  font-weight: 700;
+}
+
+.pagination-btn.disabled,
+.pagination-btn:disabled,
+.sf-pagination button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   8. Empty State & Loading / Status
+   -------------------------------------------------------------------------- */
+.empty-state,
+.sf-empty-cart,
+.sf-empty-results {
+  text-align: center;
+  padding: var(--s6) var(--s3);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   9. Icons (.ui-icon, .sf-icon)
+   -------------------------------------------------------------------------- */
+.ui-icon,
+.sf-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
