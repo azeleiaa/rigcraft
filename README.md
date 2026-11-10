@@ -198,7 +198,7 @@ Dibuat otomatis oleh `php artisan db:seed`:
   - Email: `admin@rigcraft.com`
   - Password: `admin123`
 - **Akun Customer (Role: `customer`)**:
-  - Email: `budi@example.com`
+  - Email: `adel@example.com`
   - Password: `password123`
 - **Kode Voucher Promo Aktif**:
   - `RIGCRAFT2026` (Diskon 10%, Min. belanja Rp 5.000.000)
@@ -244,3 +244,4 @@ c:\Projects\
     │   └── Feature/RigCraftApiTest.php# Pengujian PHPUnit untuk SRS §4
     └── .env                           # Konfigurasi MONGODB_URI Atlas & JWT_SECRET
 ```
+

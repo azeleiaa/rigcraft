@@ -1,3 +1,11 @@
+export type ProductSpec = [string, string]
+
+export interface ProductBenchmark {
+  game: string
+  fps: number
+  max: number
+}
+
 export interface StoreProduct {
   slug: string
   name: string
@@ -7,6 +15,8 @@ export interface StoreProduct {
   image: string
   status: 'Tersedia' | 'Habis'
   featured?: string
+  specs?: ProductSpec[]
+  benchmarks?: ProductBenchmark[]
 }
 
 export const componentProducts: StoreProduct[] = [
@@ -20,16 +30,7 @@ export const componentProducts: StoreProduct[] = [
   { slug: 'nzxt-kraken-x63', name: 'NZXT Kraken X63 280mm', category: 'Cooling', price: 2850000, description: 'AIO liquid cooler, dual 140mm fans', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=900&q=85', status: 'Tersedia' },
 ]
 
-export const prebuiltProducts: StoreProduct[] = [
-  { slug: 'titan-x-gaming', name: 'RigCraft Titan X Gaming', category: 'Gaming', price: 35000000, description: 'AMD Ryzen 9 7950X3D · RTX 4070 Ti Super · 32GB DDR5', image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia', featured: 'Terlaris' },
-  { slug: 'storm-pro', name: 'RigCraft Storm Pro', category: 'Gaming', price: 24999000, description: 'AMD Ryzen 7 7800X3D · 32GB DDR5 · RTX 4070', image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia' },
-  { slug: 'vertex-workstation', name: 'RigCraft Vertex Workstation', category: 'Workstation', price: 29500000, description: 'AMD Ryzen 9 7900 · 64GB DDR5 · RTX 4080', image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia' },
-  { slug: 'nova-office', name: 'RigCraft Nova Office', category: 'Office', price: 8999000, description: 'Intel Core i5-13400 · 16GB DDR4 · Intel UHD', image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia' },
-  { slug: 'phantom-stream', name: 'RigCraft Phantom Stream', category: 'Creator', price: 31500000, description: 'AMD Ryzen 7 7800X3D · 32GB DDR5 · RTX 4070 Ti', image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia' },
-  { slug: 'bolt-mini', name: 'RigCraft Bolt Mini', category: 'Gaming', price: 14999000, description: 'Intel Core i7-13700 · 16GB DDR5 · RTX 4060', image: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1400&q=90', status: 'Tersedia' },
-]
-
-export const titanSpecifications = [
+export const titanSpecifications: ProductSpec[] = [
   ['Processor', 'AMD Ryzen 9 7950X3D (16 Cores, 32 Threads, 4.2GHz base / 5.7GHz boost)'],
   ['GPU', 'NVIDIA GeForce RTX 4070 Ti Super 16GB GDDR6X'],
   ['Motherboard', 'ASUS ROG STRIX B650E-E Gaming WiFi'],
@@ -39,7 +40,153 @@ export const titanSpecifications = [
   ['Casing', 'NZXT H7 Flow RGB Mid Tower'],
   ['Cooling', 'NZXT Kraken X63 280mm AIO Liquid Cooler'],
   ['OS', 'Windows 11 Pro (Pre-installed)'],
-  ['Connectivity', 'WiFi 6E, Bluetooth 5.3, 2.5G LAN'],
+  ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+]
+
+export const benchmarkGames: ProductBenchmark[] = [
+  { game: 'Cyberpunk 2077 (4K Ultra, DLSS Frame Gen)', fps: 85, max: 400 },
+  { game: 'Fortnite (1080p Epic, Pro Settings)', fps: 240, max: 400 },
+  { game: 'Valorant (1080p High, Competitive)', fps: 400, max: 400 },
+]
+
+export const prebuiltProducts: StoreProduct[] = [
+  {
+    slug: 'titan-x-gaming',
+    name: 'RigCraft Titan X Gaming',
+    category: 'Gaming',
+    price: 35000000,
+    description: 'AMD Ryzen 9 7950X3D · RTX 4070 Ti Super · 32GB DDR5',
+    image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    featured: 'Terlaris',
+    specs: titanSpecifications,
+    benchmarks: benchmarkGames,
+  },
+  {
+    slug: 'storm-pro',
+    name: 'RigCraft Storm Pro',
+    category: 'Gaming',
+    price: 24999000,
+    description: 'AMD Ryzen 7 7800X3D · 32GB DDR5 · RTX 4070',
+    image: 'https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    specs: [
+      ['Processor', 'AMD Ryzen 7 7800X3D (8 Cores, 16 Threads, 4.2GHz / 5.0GHz boost)'],
+      ['GPU', 'NVIDIA GeForce RTX 4070 12GB GDDR6X'],
+      ['Motherboard', 'MSI MAG B650 Tomahawk WiFi (AM5, DDR5)'],
+      ['RAM', '32GB DDR5 6000MHz (2x16GB)'],
+      ['Storage', '1TB NVMe PCIe Gen4 SSD'],
+      ['PSU', '750W 80+ Gold Fully Modular'],
+      ['Casing', 'NZXT H5 Flow Mid Tower'],
+      ['Cooling', '240mm AIO Liquid Cooler'],
+      ['OS', 'Windows 11 Home (Pre-installed)'],
+      ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+    ],
+    benchmarks: [
+      { game: 'Cyberpunk 2077 (1440p Ultra)', fps: 95, max: 400 },
+      { game: 'Fortnite (1080p Epic)', fps: 210, max: 400 },
+      { game: 'Valorant (1080p High)', fps: 380, max: 400 },
+    ],
+  },
+  {
+    slug: 'vertex-workstation',
+    name: 'RigCraft Vertex Workstation',
+    category: 'Workstation',
+    price: 29500000,
+    description: 'AMD Ryzen 9 7900 · 64GB DDR5 · RTX 4080',
+    image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    specs: [
+      ['Processor', 'AMD Ryzen 9 7900 (12 Cores, 24 Threads, up to 5.4GHz)'],
+      ['GPU', 'NVIDIA GeForce RTX 4080 16GB GDDR6X'],
+      ['Motherboard', 'ASUS ProArt B650-Creator WiFi'],
+      ['RAM', '64GB DDR5 5600MHz (2x32GB)'],
+      ['Storage', '2TB NVMe PCIe Gen4 SSD'],
+      ['PSU', '850W 80+ Gold Fully Modular'],
+      ['Casing', 'Fractal Design Pop Silent'],
+      ['Cooling', '360mm AIO Liquid Cooler'],
+      ['OS', 'Windows 11 Pro (Pre-installed)'],
+      ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+    ],
+    benchmarks: [
+      { game: 'Cyberpunk 2077 (4K Ultra)', fps: 72, max: 400 },
+      { game: 'Starfield (1440p Ultra)', fps: 68, max: 400 },
+      { game: 'Valorant (1080p High)', fps: 340, max: 400 },
+    ],
+  },
+  {
+    slug: 'nova-office',
+    name: 'RigCraft Nova Office',
+    category: 'Office',
+    price: 8999000,
+    description: 'Intel Core i5-13400 · 16GB DDR4 · Intel UHD',
+    image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    specs: [
+      ['Processor', 'Intel Core i5-13400 (10 Cores, 16 Threads, up to 4.6GHz)'],
+      ['GPU', 'Intel UHD Graphics 730 (Integrated)'],
+      ['Motherboard', 'ASUS Prime B760M-A WiFi (LGA1700)'],
+      ['RAM', '16GB DDR4 3200MHz (2x8GB)'],
+      ['Storage', '512GB NVMe PCIe Gen3 SSD'],
+      ['PSU', '500W 80+ Bronze'],
+      ['Casing', 'mATX Office Case'],
+      ['Cooling', 'Intel Stock Cooler'],
+      ['OS', 'Windows 11 Home (Pre-installed)'],
+      ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+    ],
+  },
+  {
+    slug: 'phantom-stream',
+    name: 'RigCraft Phantom Stream',
+    category: 'Creator',
+    price: 31500000,
+    description: 'AMD Ryzen 7 7800X3D · 32GB DDR5 · RTX 4070 Ti',
+    image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    specs: [
+      ['Processor', 'AMD Ryzen 7 7800X3D (8 Cores, 16 Threads, 4.2GHz / 5.0GHz boost)'],
+      ['GPU', 'NVIDIA GeForce RTX 4070 Ti 12GB GDDR6X'],
+      ['Motherboard', 'MSI MAG B650 Tomahawk WiFi'],
+      ['RAM', '32GB DDR5 6000MHz (2x16GB)'],
+      ['Storage', '2TB NVMe PCIe Gen4 SSD'],
+      ['PSU', '850W 80+ Gold Fully Modular'],
+      ['Casing', 'Lian Li O11 Air Mini'],
+      ['Cooling', '280mm AIO Liquid Cooler'],
+      ['OS', 'Windows 11 Pro (Pre-installed)'],
+      ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+    ],
+    benchmarks: [
+      { game: 'Cyberpunk 2077 (1440p Ultra)', fps: 82, max: 400 },
+      { game: 'Fortnite (1080p Epic)', fps: 220, max: 400 },
+      { game: 'Valorant (1080p High)', fps: 390, max: 400 },
+    ],
+  },
+  {
+    slug: 'bolt-mini',
+    name: 'RigCraft Bolt Mini',
+    category: 'Gaming',
+    price: 14999000,
+    description: 'Intel Core i7-13700 · 16GB DDR5 · RTX 4060',
+    image: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=1400&q=90',
+    status: 'Tersedia',
+    specs: [
+      ['Processor', 'Intel Core i7-13700 (16 Cores, 24 Threads, up to 5.2GHz)'],
+      ['GPU', 'NVIDIA GeForce RTX 4060 8GB GDDR6'],
+      ['Motherboard', 'MSI MAG B760M Mortar WiFi (LGA1700)'],
+      ['RAM', '16GB DDR5 5600MHz (2x8GB)'],
+      ['Storage', '1TB NVMe PCIe Gen4 SSD'],
+      ['PSU', '650W 80+ Bronze'],
+      ['Casing', 'Mini Tower mATX'],
+      ['Cooling', 'Dual-fan Air Cooler'],
+      ['OS', 'Windows 11 Home (Pre-installed)'],
+      ['Garansi', '2 tahun garansi resmi sparepart & jasa rakit'],
+    ],
+    benchmarks: [
+      { game: 'Cyberpunk 2077 (1080p High)', fps: 55, max: 400 },
+      { game: 'Fortnite (1080p Epic)', fps: 160, max: 400 },
+      { game: 'Valorant (1080p High)', fps: 300, max: 400 },
+    ],
+  },
 ]
 
 export const upgradeProducts = [
@@ -47,12 +194,6 @@ export const upgradeProducts = [
   { title: 'Upgrade Storage', detail: 'Tambah Samsung 990 Pro 2TB NVMe SSD', price: 2949000, image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=500&q=80' },
   { title: 'Upgrade GPU', detail: 'Dari RTX 4070 Ti ke RTX 4080 Super 16GB', price: 5500000, image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=500&q=80' },
   { title: 'Upgrade Cooling', detail: 'Dari 280mm AIO ke Corsair iCUE H150i 360mm', price: 850000, image: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=500&q=80' },
-]
-
-export const benchmarkGames = [
-  { game: 'Cyberpunk 2077 (4K Ultra, DLSS Frame Gen)', fps: 85, max: 400 },
-  { game: 'Fortnite (1080p Epic, Pro Settings)', fps: 240, max: 400 },
-  { game: 'Valorant (1080p High, Competitive)', fps: 400, max: 400 },
 ]
 
 export const builderComponents = [
