@@ -849,7 +849,9 @@
 .sf-build-cta-inner > div {
   position: relative;
   z-index: 1;
-  max-width: 660px;
+  min-width: 0;
+  max-width: 760px;
+  flex: 1 1 auto;
 }
 
 .sf-build-cta h2 {
@@ -875,20 +877,6 @@
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-}
-
-.sf-cta-mark {
-  position: absolute;
-  top: 50%;
-  right: 22%;
-  color: rgba(255, 255, 255, 0.045);
-  transform: translateY(-50%) scale(4.2);
-  pointer-events: none;
-}
-
-.sf-cta-mark .sf-icon {
-  width: 42px;
-  height: 42px;
 }
 
 /* Reviews / Testimonials */
@@ -1854,9 +1842,9 @@
   top: calc(var(--nav-h) - 1px);
   z-index: 70;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 360px) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, min(360px, 30%)) minmax(0, max-content);
   align-items: center;
-  gap: clamp(18px, 3vw, 44px);
+  gap: clamp(12px, 2vw, 28px);
   padding: 14px clamp(16px, 2.2vw, 26px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1924,6 +1912,7 @@
 
 .sf-status-power {
   display: grid;
+  min-width: 0;
   gap: 8px;
   padding-left: clamp(18px, 2vw, 28px);
   border-left: 1px solid var(--border);
@@ -1983,6 +1972,7 @@
 
 .sf-build-total {
   display: grid;
+  min-width: 0;
   gap: 2px;
   padding-left: clamp(18px, 2vw, 28px);
   border-left: 1px solid var(--border);
@@ -3667,7 +3657,7 @@
   .sf-auth-visual { display: none; }
 }
 
-@media (max-width: 768.99px) {
+@media (max-width: 900.99px) {
   .sf-builder-status {
     position: static;
     top: auto;
@@ -3706,6 +3696,10 @@
 }
 
 @media (max-width: 600px) {
+  .sf-build-cta-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
   .sf-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sf-product-grid,
   .sf-catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
