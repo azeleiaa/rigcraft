@@ -1785,6 +1785,9 @@
    PC Builder (.sf-builder-page)
    ========================================================================== */
 .sf-builder-page {
+  --nav-h: 65.04px;
+  --bar-h: 69.59px;
+  --gap: var(--s2);
   padding-top: var(--s3);
   padding-bottom: var(--s8);
 }
@@ -1802,6 +1805,9 @@
 }
 
 .sf-builder-status {
+  position: sticky;
+  top: calc(var(--nav-h) - 1px);
+  z-index: 70;
   display: grid;
   grid-template-columns: auto minmax(140px, 1fr) auto minmax(80px, 120px) auto;
   align-items: center;
@@ -1810,6 +1816,18 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.sf-builder-status::after {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: var(--gap);
+  background: var(--surface);
+  content: '';
+  pointer-events: none;
 }
 
 .sf-compatibility {
@@ -2188,7 +2206,11 @@
 /* Builder Aside / Summary */
 .sf-builder-aside {
   position: sticky;
-  top: 84px;
+  top: calc(var(--nav-h) + var(--bar-h) + var(--gap));
+  align-self: start;
+  z-index: 60;
+  max-height: calc(100vh - var(--nav-h) - var(--bar-h) - var(--gap));
+  overflow-y: auto;
   padding: var(--s3);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -2860,12 +2882,15 @@
    Sign-in & Register (Auth)
    ========================================================================== */
 .sf-auth-page {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
   display: grid;
   min-height: 600px;
   grid-template-columns: 1.1fr 0.9fr;
-  align-items: center;
-  gap: var(--s6);
-  padding-block: var(--s6);
+  align-items: stretch;
+  gap: var(--s3);
+  padding: var(--s6) clamp(16px, 3.5vw, 48px);
 }
 
 .sf-auth-visual {
@@ -2879,7 +2904,11 @@
 }
 
 .sf-auth-visual::after {
-  display: none !important;
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  content: '';
 }
 
 .sf-auth-visual > img {
@@ -2887,12 +2916,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.25;
+  filter: grayscale(1) brightness(0.45);
 }
 
 .sf-auth-visual-content {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   inset: var(--s4);
   display: flex;
   flex-direction: column;
@@ -2901,7 +2930,7 @@
 }
 
 .sf-auth-visual-content h1 {
-  margin: 14px 0 10px;
+  margin: var(--s2) 0 var(--s1);
   font-family: var(--font-display);
   font-size: clamp(30px, 3.8vw, 46px);
   font-weight: 700;
@@ -2926,14 +2955,20 @@
 
 .sf-auth-benefits {
   display: grid;
-  gap: 12px;
-  margin-top: 20px;
+  gap: var(--s2);
+  margin-top: var(--s3);
 }
 
 .sf-auth-benefits > div {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--s1);
+}
+
+.sf-auth-benefits > div > span {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
 }
 
 .sf-auth-benefits > div > .sf-icon {
@@ -2947,6 +2982,7 @@
 }
 
 .sf-auth-benefits strong {
+  display: block;
   font-family: var(--font-display);
   font-size: 11px;
   text-transform: uppercase;
@@ -2954,13 +2990,39 @@
 }
 
 .sf-auth-benefits small {
+  display: block;
   color: var(--text-muted);
   font-size: 10px;
 }
 
+.sf-auth-proof {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-top: var(--s4);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--border);
+}
+
+.sf-auth-proof > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.sf-auth-proof strong {
+  display: block;
+}
+
+.sf-auth-proof small {
+  display: block;
+  color: var(--text-muted);
+}
+
 .sf-auth-panel {
-  width: min(100%, 460px);
-  justify-self: center;
+  width: 100%;
+  justify-self: stretch;
+  align-self: stretch;
   padding: var(--s4);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -3121,6 +3183,102 @@
 .sf-auth-switch a {
   color: var(--accent);
   font-weight: 600;
+}
+
+/* ==========================================================================
+   Recommended Upgrades
+   ========================================================================== */
+.sf-upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--s3);
+}
+
+.sf-upgrade-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.sf-upgrade-card > img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  filter: saturate(0.6) brightness(0.9);
+  transition: filter var(--transition);
+}
+
+.sf-upgrade-card:hover > img {
+  filter: none;
+}
+
+.sf-upgrade-copy {
+  flex: 1 0 auto;
+  min-width: 0;
+  padding: var(--s2);
+}
+
+.sf-upgrade-copy h3 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sf-upgrade-copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: var(--s1) 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sf-upgrade-copy small {
+  display: block;
+  margin-top: var(--s1);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.sf-upgrade-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s1);
+  margin-top: auto;
+  padding: var(--s2);
+  border-top: 1px solid var(--border);
+}
+
+.sf-upgrade-footer > strong {
+  min-width: 0;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.sf-upgrade-footer > .sf-button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding-inline: var(--s2);
+}
+
+.sf-upgrade-footer > .sf-button.sf-button-outline:hover {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
 }
 
 /* ==========================================================================
@@ -3326,6 +3484,15 @@
   .sf-builder-content { grid-template-columns: minmax(0, 1fr) 280px; }
 }
 
+@media (max-width: 1024.99px) {
+  .sf-builder-aside {
+    position: static;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
 @media (max-width: 800px) {
   .sf-header-inner { min-height: 58px; }
   .sf-menu-toggle { display: block; order: 3; }
@@ -3356,10 +3523,51 @@
   .sf-cart-layout,
   .sf-checkout-layout { grid-template-columns: 1fr; }
   .sf-builder-content { grid-template-columns: 1fr; }
-  .sf-builder-aside { position: static; }
   .sf-auth-page { grid-template-columns: 1fr; gap: var(--s3); }
   .sf-auth-visual { display: none; }
   .sf-footer-main { grid-template-columns: 1fr 1fr; gap: var(--s4); }
+}
+
+@media (max-width: 900.99px) {
+  .sf-auth-page {
+    grid-template-columns: 1fr;
+    gap: var(--s3);
+    padding-block: var(--s4);
+  }
+
+  .sf-auth-visual { display: none; }
+}
+
+@media (max-width: 768.99px) {
+  .sf-builder-status {
+    position: static;
+    top: auto;
+    z-index: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s1) var(--s2);
+  }
+
+  .sf-builder-status::after { display: none; }
+
+  .sf-builder-status > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .sf-builder-status > span:nth-child(2) {
+    flex: 1 1 0;
+  }
+
+  .sf-builder-status > div:not(.sf-power-meter),
+  .sf-builder-status > .sf-power-meter {
+    flex: 1 1 100%;
+  }
+
+  .sf-builder-status strong {
+    white-space: normal;
+  }
 }
 
 @media (max-width: 600px) {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { builderComponents, formatRupiah } from '../../storefront/data'
 import type { StoreProduct } from '../../storefront/data'
@@ -25,6 +25,24 @@ export default function Builder() {
   const [openId, setOpenId] = useState<string | null>(null)
   const { addToCart } = useStoreCart()
   const navigate = useNavigate()
+
+  useLayoutEffect(() => {
+    const page = document.querySelector<HTMLElement>('.sf-builder-page')
+    const header = document.querySelector<HTMLElement>('.sf-header')
+    const status = page?.querySelector<HTMLElement>('.sf-builder-status')
+    if (!page || !header || !status) return
+
+    const updateStickyHeights = () => {
+      page.style.setProperty('--nav-h', `${header.getBoundingClientRect().height}px`)
+      page.style.setProperty('--bar-h', `${status.getBoundingClientRect().height}px`)
+    }
+    const observer = new ResizeObserver(updateStickyHeights)
+    observer.observe(header)
+    observer.observe(status)
+    updateStickyHeights()
+
+    return () => observer.disconnect()
+  }, [])
 
   const selectedCount = Object.values(selected).filter((value) => value !== null).length
   const selectedOptions = builderComponents.map((component) => ({ component, option: selected[component.id] === null ? undefined : component.options[selected[component.id] ?? 0] }))
