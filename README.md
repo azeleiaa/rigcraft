@@ -149,12 +149,12 @@ npm run dev
 Aplikasi frontend akan terbuka di: `http://localhost:5173`.  
 Versi produksi telah di-deploy di Vercel: **[https://rigcraft-ebon.vercel.app](https://rigcraft-ebon.vercel.app)**.
 
-Untuk pengembangan lokal, salin `.env.example` ke `.env.local` dan atur endpoint API:
+Untuk mengatur endpoint backend API di frontend, gunakan file `.env`:
 ```env
 VITE_API_URL=http://localhost:8000/api/v1
 ```
 
-Login dan pendaftaran akan memakai backend jika `VITE_API_URL` diatur. Tanpa konfigurasi itu, halaman autentikasi berjalan dalam mode demo lokal.
+Helper API terpusat tersedia di `src/lib/api.ts` (`authApi`, `productsApi`, `builderApi`, `cartApi`, `ordersApi`, `adminApi`).
 
 ---
 
@@ -184,7 +184,7 @@ API lokal berjalan di `http://localhost:8000`. Endpoint health check: `http://lo
    - `JWT_SECRET` — buat secret random baru; jangan commit atau bagikan nilainya.
 4. Di MongoDB Atlas, pastikan user database demo boleh terhubung dari Render. Batasi user hanya ke database demo dan jangan gunakan kredensial database yang dipakai bersama.
 5. Setelah deploy, tunggu status **Live**, lalu uji `https://<domain-render>/up`. Render Free menidurkan service setelah 15 menit tidak aktif; request pertama berikutnya bisa memerlukan sekitar satu menit.
-6. Di Vercel, atur `VITE_API_URL=https://<domain-render>/api/v1` untuk Production lalu redeploy frontend.
+6. Kirim URL API `https://<domain-render>/api/v1` ke tim frontend agar mereka dapat mengatur `VITE_API_URL` di Vercel dan menghubungkan halaman aplikasi.
 
 Jangan gunakan database bersama untuk demo: seeder menjalankan `truncate` pada koleksi user, produk, voucher, dan order.
 
