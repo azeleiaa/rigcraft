@@ -1,7 +1,7 @@
 # Panduan Belajar Progress Backend RigCraft
 
-**Tujuan:** pegangan singkat untuk memahami dan melaporkan progress backend.  
-**Status per:** 11 November 2026  
+**Tujuan:** pegangan singkat untuk memahami dan melaporkan progress backend.
+**Status per:** 11 November 2026
 **Catatan:** panduan ini membedakan implementasi yang sudah ada, perubahan repository hari ini, dan pekerjaan yang belum selesai.
 
 ## Ringkasan satu menit
@@ -115,31 +115,31 @@ Render Free menidurkan web service setelah sekitar 15 menit tidak aktif; request
 
 ## Pertanyaan yang mungkin ditanyakan
 
-**“Apa yang sudah kamu kerjakan sebagai backend?”**  
+**“Apa yang sudah kamu kerjakan sebagai backend?”**
 “Saya menyiapkan source Laravel di repository utama, mendokumentasikan endpoint dan cara menjalankannya, menambahkan container Docker untuk deployment, serta menyiapkan konfigurasi Render Free dan CORS. Fitur API mencakup auth JWT, katalog produk, builder, voucher, cart/order, dan admin.”
 
-**“Apa bedanya backend dan frontend?”**  
+**“Apa bedanya backend dan frontend?”**
 “Backend menangani API, aturan bisnis, autentikasi, dan database. Frontend menampilkan antarmuka dan memanggil API. Saya menyiapkan API dan akan menyerahkan URL-nya ke tim frontend; mereka menghubungkan URL tersebut dari halaman aplikasi.”
 
-**“Apa itu JWT dan kenapa dipakai?”**  
+**“Apa itu JWT dan kenapa dipakai?”**
 “Setelah login berhasil, backend memberikan token. Frontend mengirim token itu pada request privat supaya backend bisa memeriksa identitas pengguna tanpa menyimpan session login di server.”
 
-**“Bagaimana admin dibedakan dari customer?”**  
+**“Bagaimana admin dibedakan dari customer?”**
 “Route admin diberi middleware autentikasi dan pemeriksaan role. Jadi token valid saja belum cukup; pengguna harus mempunyai role admin.”
 
-**“Apakah backend sudah live?”**  
+**“Apakah backend sudah live?”**
 “Belum. Blueprint Render dan Dockerfile sudah disiapkan di GitHub. Deployment masih menunggu setup akun/service, pengisian secret, dan koneksi MongoDB Atlas.”
 
-**“Apakah semua test lulus?”**  
+**“Apakah semua test lulus?”**
 “Belum. Saat ini ada empat test yang gagal karena konfigurasi PHPUnit masih mengarah ke SQLite `:memory:`, sedangkan model menggunakan MongoDB. Saya perlu menyelaraskan test database, lalu menjalankan dan melaporkan hasilnya lagi.”
 
-**“Apakah frontend sudah tersambung ke API?”**  
+**“Apakah frontend sudah tersambung ke API?”**
 “Belum diverifikasi end-to-end. Tugas backend saya menyiapkan dan memberikan URL API; integrasi halaman frontend dilakukan oleh tim frontend.”
 
-**“Kenapa jangan langsung jalankan seeder?”**  
+**“Kenapa jangan langsung jalankan seeder?”**
 “Seeder mengosongkan beberapa collection sebelum membuat data demo. Karena itu saya harus memastikan URI mengarah ke database demo terpisah agar data lain tidak terhapus.”
 
-**“Apakah sudah memenuhi performa <500 ms?”**  
+**“Apakah sudah memenuhi performa <500 ms?”**
 “Belum saya ukur. Perintah pembuatan index sudah ada, tetapi target response time perlu diuji pada API yang berjalan dan dilaporkan dengan hasil ukur.”
 
 ## Kalimat laporan singkat
