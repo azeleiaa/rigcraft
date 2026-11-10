@@ -174,22 +174,17 @@ php artisan serve --host 0.0.0.0 --port 8000
 ```
 API lokal berjalan di `http://localhost:8000`. Endpoint health check: `http://localhost:8000/up`.
 
-### 4. Deploy Backend ke Railway untuk Demo Vercel
+### 4. Deploy Backend ke Render Free untuk Demo Vercel
 
 1. Pastikan perubahan repository ini sudah di-push ke GitHub.
-2. Di Railway, buat project dari repository `azeleiaa/rigcraft` dan atur **Root Directory** ke `/api`. Railway akan membangun `api/Dockerfile`.
-3. Tambahkan environment variables pada service Railway:
-   - `APP_ENV=production`
-   - `APP_DEBUG=false`
-   - `APP_KEY` — buat key Laravel baru, jangan commit nilainya.
-   - `APP_URL` — URL publik HTTPS service Railway.
-   - `DB_CONNECTION=mongodb`
-   - `DB_DATABASE` — nama database demo khusus.
-   - `MONGODB_URI` — URI MongoDB Atlas untuk database demo.
-   - `JWT_SECRET` — secret JWT baru.
-   - `CORS_ALLOWED_ORIGINS=https://rigcraft-ebon.vercel.app`
-4. Generate domain publik Railway, tunggu deployment berstatus **Healthy**, lalu uji `https://<domain-railway>/up`.
-5. Di Vercel, atur `VITE_API_URL=https://<domain-railway>/api/v1` untuk Production dan deploy ulang frontend.
+2. Di Render, buat **New → Blueprint** dari repository `azeleiaa/rigcraft`; Render akan membaca `render.yaml` dan membangun service `rigcraft-api` dari folder `api/`.
+3. Isi nilai rahasia yang diminta Blueprint di Render:
+   - `APP_KEY` — buat key baru dengan `php artisan key:generate --show`.
+   - `MONGODB_URI` — URI MongoDB Atlas untuk database demo `rigcraft_demo`.
+   - `JWT_SECRET` — buat secret random baru; jangan commit atau bagikan nilainya.
+4. Di MongoDB Atlas, pastikan user database demo boleh terhubung dari Render. Batasi user hanya ke database demo dan jangan gunakan kredensial database yang dipakai bersama.
+5. Setelah deploy, tunggu status **Live**, lalu uji `https://<domain-render>/up`. Render Free menidurkan service setelah 15 menit tidak aktif; request pertama berikutnya bisa memerlukan sekitar satu menit.
+6. Di Vercel, atur `VITE_API_URL=https://<domain-render>/api/v1` untuk Production lalu redeploy frontend.
 
 Jangan gunakan database bersama untuk demo: seeder menjalankan `truncate` pada koleksi user, produk, voucher, dan order.
 

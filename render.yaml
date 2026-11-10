@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: rigcraft-api
+    runtime: docker
+    plan: free
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /up
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: mongodb
+      - key: DB_DATABASE
+        value: rigcraft_demo
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://rigcraft-ebon.vercel.app
+      - key: LOG_CHANNEL
+        value: stderr
