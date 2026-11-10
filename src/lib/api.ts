@@ -4,6 +4,7 @@
 // ============================================================
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
 
 function getAuthHeader(): Record<string, string> {
   const token = localStorage.getItem('rigcraft_token')
@@ -20,10 +21,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   }
 
   const response = await fetch(url, { ...options, headers })
-  const data = await response.json().catch(() => ({}))
+  const data = await response.json().catch(() => null)
 
   if (!response.ok) {
-    throw new Error(data.message || `Request failed with status ${response.status}`)
+    const errors = data && typeof data.errors === 'object' && data.errors !== null
+      ? Object.values(data.errors as Record<string, string[]>).flat()
+      : []
+    throw new Error(data?.message || errors[0] || `Request failed with status ${response.status}`)
   }
 
   return data
@@ -236,4 +240,3 @@ export const adminApi = {
     })
   },
 }
-

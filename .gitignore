@@ -24,3 +24,11 @@ dist-ssr
 *.sw?
 .vercel
 
+# Laravel API local files and dependencies
+/api/.env
+/api/.env.*
+!/api/.env.example
+/api/vendor
+/api/storage/**
+/api/bootstrap/cache/*.php
+/api/.phpunit.result.cache

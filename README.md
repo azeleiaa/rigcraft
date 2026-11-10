@@ -27,9 +27,9 @@ Sistem menggunakan pendekatan **Decoupled Architecture** (pemisahan penuh layer 
 ```
 +------------------------------------+              +------------------------------------+
 |          FRONTEND LAYER            |              |           BACKEND LAYER            |
-|       React.js + TypeScript        |  HTTP REST   |        Laravel 11 REST API         |
+|       React.js + TypeScript        |  HTTP REST   |        Laravel 13 REST API         |
 |   (Desktop, Tablet & Mobile UI)    |<============>|    (JWT Auth + Rule Validation)    |
-|    Hosted: Vercel (Production)     |  (JSON/JWT)  |     Directory: rigcraft-api        |
+|    Hosted: Vercel (Production)     |  (JSON/JWT)  |     Directory: api/                |
 +------------------------------------+              +-----------------+------------------+
                                                                       |
                                                                       | mongodb/laravel-mongodb
@@ -42,7 +42,7 @@ Sistem menggunakan pendekatan **Decoupled Architecture** (pemisahan penuh layer 
 ```
 
 - **Frontend Layer**: Menggunakan React 18, TypeScript, dan Vite. Berjalan sebagai *Single Page Application* (SPA) responsif dengan styling custom CSS (*industrial dark theme* dengan aksen biru).
-- **Backend Layer**: RESTful API berbasis Laravel 11 dengan autentikasi stateless JSON Web Token (JWT) via `php-open-source-saver/jwt-auth`.
+- **Backend Layer**: RESTful API berbasis Laravel 13 dengan autentikasi stateless JSON Web Token (JWT) via `php-open-source-saver/jwt-auth`.
 - **Database Layer**: MongoDB NoSQL via driver `mongodb/laravel-mongodb`. Setiap kategori komponen PC memiliki fleksibilitas penyimpanan atribut spesifikasi (*specs*) yang berbeda tanpa keterbatasan skema kaku.
 
 ---
@@ -128,7 +128,7 @@ Base URL Lokal: `http://localhost:8000/api/v1`
 
 ### 1. Prasyarat Sistem
 - **Node.js**: v18+ (disarankan Node.js 20+)
-- **PHP**: v8.2+ (termasuk ekstensi `mongodb`, `openssl`, `curl`, `mbstring`, `zip`)
+- **PHP**: v8.3+ (termasuk ekstensi `mongodb`, `openssl`, `mbstring`, `zip`)
 - **Composer**: v2+
 - **MongoDB**: Akun MongoDB Atlas (Cloud) atau MongoDB Community lokal
 
@@ -149,44 +149,57 @@ npm run dev
 Aplikasi frontend akan terbuka di: `http://localhost:5173`.  
 Versi produksi telah di-deploy di Vercel: **[https://rigcraft-ebon.vercel.app](https://rigcraft-ebon.vercel.app)**.
 
-Untuk mengatur endpoint backend API di frontend, gunakan file `.env`:
+Untuk pengembangan lokal, salin `.env.example` ke `.env.local` dan atur endpoint API:
 ```env
 VITE_API_URL=http://localhost:8000/api/v1
 ```
 
-Helper API terpusat tersedia di `src/lib/api.ts` (`authApi`, `productsApi`, `builderApi`, `cartApi`, `ordersApi`, `adminApi`).
+Login dan pendaftaran akan memakai backend jika `VITE_API_URL` diatur. Tanpa konfigurasi itu, halaman autentikasi berjalan dalam mode demo lokal.
 
 ---
 
-### 3. Menjalankan Backend (Laravel API)
+### 3. Menjalankan Backend Lokal (Laravel API)
 
 ```powershell
-# 1. Pindah ke direktori backend API
-cd c:\Projects\rigcraft-api
+cd C:\Projects\rigcraft\api
+composer install
+Copy-Item .env.example .env
+php artisan key:generate
+php artisan jwt:secret
 
-# 2. Pastikan file .env telah terkonfigurasi dengan MongoDB Atlas
-# (Kredensial sudah terpasang di .env)
-# MONGODB_URI="mongodb+srv://devanandadelia_db_user:30cn4EUfg9CselKO@rigcraft-cluster.qgw6qw3.mongodb.net/rigcraft?retryWrites=true&w=majority"
-
-# 3. Jalankan Database Seeder (Membuat data dummy produk, voucher, admin & customer)
-php artisan db:seed
-
-# 4. Jalankan server Laravel API
-php artisan serve
+# Atur MongoDB Atlas di .env sebelum menjalankan API.
+# Gunakan database demo terpisah; db:seed menghapus data koleksi demo yang ada.
+php artisan test
+php artisan serve --host 0.0.0.0 --port 8000
 ```
-Server API backend akan aktif di: **`http://localhost:8000`**.
+API lokal berjalan di `http://localhost:8000`. Endpoint health check: `http://localhost:8000/up`.
 
----
+### 4. Deploy Backend ke Railway untuk Demo Vercel
 
-### 4. Menjalankan Pengujian Otomatis (PHPUnit)
+1. Pastikan perubahan repository ini sudah di-push ke GitHub.
+2. Di Railway, buat project dari repository `azeleiaa/rigcraft` dan atur **Root Directory** ke `/api`. Railway akan membangun `api/Dockerfile`.
+3. Tambahkan environment variables pada service Railway:
+   - `APP_ENV=production`
+   - `APP_DEBUG=false`
+   - `APP_KEY` — buat key Laravel baru, jangan commit nilainya.
+   - `APP_URL` — URL publik HTTPS service Railway.
+   - `DB_CONNECTION=mongodb`
+   - `DB_DATABASE` — nama database demo khusus.
+   - `MONGODB_URI` — URI MongoDB Atlas untuk database demo.
+   - `JWT_SECRET` — secret JWT baru.
+   - `CORS_ALLOWED_ORIGINS=https://rigcraft-ebon.vercel.app`
+4. Generate domain publik Railway, tunggu deployment berstatus **Healthy**, lalu uji `https://<domain-railway>/up`.
+5. Di Vercel, atur `VITE_API_URL=https://<domain-railway>/api/v1` untuk Production dan deploy ulang frontend.
 
-Sesuai rencana pengujian pada SRS §4:
+Jangan gunakan database bersama untuk demo: seeder menjalankan `truncate` pada koleksi user, produk, voucher, dan order.
+
+### 5. Menjalankan Pengujian Otomatis (PHPUnit)
 
 ```powershell
-cd c:\Projects\rigcraft-api
+cd C:\Projects\rigcraft\api
+composer install
 php artisan test
 ```
-*Hasil uji: 6 passed tests, 9 assertions (100% lulus).*
 
 ---
 
@@ -225,7 +238,7 @@ c:\Projects\
 │   ├── vercel.json                    # Konfigurasi SPA routing rewrite untuk Vercel
 │   └── package.json
 │
-└── rigcraft-api/                      # Layer Backend (Laravel 11 + MongoDB NoSQL)
+├── api/                                # Layer Backend (Laravel 13 + MongoDB NoSQL)
     ├── app/
     │   ├── Http/
     │   │   ├── Controllers/Api/       # AuthController, ProductController, BuilderController, CartController, OrderController, AdminController
@@ -242,6 +255,5 @@ c:\Projects\
     │   └── api.php                    # 21 REST API Endpoints (/api/v1/...)
     ├── tests/
     │   └── Feature/RigCraftApiTest.php# Pengujian PHPUnit untuk SRS §4
-    └── .env                           # Konfigurasi MONGODB_URI Atlas & JWT_SECRET
+    └── .env.example                   # Template konfigurasi; secret disimpan di .env lokal
 ```
-
