@@ -17,6 +17,7 @@ import Checkout from './pages/storefront/Checkout'
 import Auth from './pages/storefront/Auth'
 import About from './pages/storefront/About'
 import { authApi } from './lib/api'
+import './styles/forms.css'
 
 function RequireAdminAuth() {
   const location = useLocation()

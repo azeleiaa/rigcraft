@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Kolom isian dasar (admin dan toko)
+   Memakai :where() agar spesifisitasnya nol: aturan khusus komponen
+   (search bar, kupon, dll.) tetap menang atas gaya dasar ini.
+   ========================================================================== */
+
+:is(.main-content, .storefront) :where(
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color'], [type='hidden']),
+  select,
+  textarea
+) {
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  color-scheme: dark;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.4;
+  box-shadow: none;
+  outline: 0;
+  transition: border-color var(--transition);
+}
+
+:is(.main-content, .storefront) :where(textarea) {
+  min-height: 88px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+:is(.main-content, .storefront) :where(
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color'], [type='hidden']):hover,
+  select:hover,
+  textarea:hover
+) {
+  border-color: var(--text-muted);
+}
+
+:is(.main-content, .storefront) :where(
+  input:not([type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='color'], [type='hidden']):focus,
+  select:focus,
+  textarea:focus
+) {
+  border-color: var(--accent);
+}
+
+:is(.main-content, .storefront) :where(
+  input:disabled,
+  select:disabled,
+  textarea:disabled
+) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:is(.main-content, .storefront) :where(input, textarea)::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* Isian otomatis Chrome (email/password tersimpan) tidak lagi putih atau biru muda */
+:is(.main-content, .storefront) :where(input):-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+  box-shadow: 0 0 0 1000px var(--bg) inset;
+}
+
+:is(.main-content, .storefront) :where(input[type='checkbox'], input[type='radio'], input[type='range']) {
+  accent-color: var(--accent);
+}
