@@ -88,14 +88,23 @@ export const productsApi = {
     brand?: string
     min_price?: number
     max_price?: number
+    socket?: string
+    ramType?: string
     sort?: string
+    page?: number
+    per_page?: number
   } = {}) {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== '') query.append(k, String(v))
     })
     const qs = query.toString() ? `?${query.toString()}` : ''
-    return request<{ success: boolean; count: number; data: any[] }>(`/products${qs}`)
+    return request<{
+      success: boolean
+      count: number
+      data: any[]
+      meta?: { total: number; page: number; per_page: number; total_pages: number }
+    }>(`/products${qs}`)
   },
 
   async getById(id: string) {
@@ -106,19 +115,41 @@ export const productsApi = {
 // -------------------------------------------------------------
 // PC Builder Simulation & Rule-Based Validation (FR-004)
 // -------------------------------------------------------------
+export interface BuilderIssue {
+  rule: string
+  message: string
+}
+
+export interface BuilderResult {
+  compatible: boolean
+  issues: BuilderIssue[]
+  warnings: string[]
+  estimatedWattage: number
+  recommendedPsuWattage: number
+  checks: Record<string, boolean>
+}
+
 export const builderApi = {
-  async validate(components: Record<string, string>) {
-    return request<{
-      success: boolean
-      is_compatible: boolean
-      estimated_wattage: number
-      recommended_psu_wattage: number
-      checks: Record<string, boolean>
-      warnings: string[]
-    }>('/builder/validate', {
+  async validate(selection: Partial<Record<'processor' | 'motherboard' | 'ram' | 'gpu' | 'psu', string>>): Promise<BuilderResult> {
+    const res = await request<any>('/builder/validate', {
       method: 'POST',
-      body: JSON.stringify({ components }),
+      body: JSON.stringify(selection),
     })
+    const d = res?.data ?? res
+    return {
+      compatible: Boolean(d.compatible ?? d.is_compatible),
+      issues: Array.isArray(d.issues)
+        ? d.issues.map((issue: any) =>
+            typeof issue === 'string'
+              ? { rule: '', message: issue }
+              : { rule: String(issue.rule ?? ''), message: String(issue.message ?? '') },
+          )
+        : [],
+      warnings: Array.isArray(d.warnings) ? d.warnings.map(String) : [],
+      estimatedWattage: Number(d.estimatedWattage ?? d.estimated_wattage ?? 0),
+      recommendedPsuWattage: Number(d.recommendedPsuWattage ?? d.recommended_psu_wattage ?? 0),
+      checks: d.checks ?? {},
+    }
   },
 }
 
@@ -233,6 +264,22 @@ export const adminApi = {
     return request<{ success: boolean; message: string; data: any }>(`/admin/orders/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
+    })
+  },
+}
+
+// -------------------------------------------------------------
+// Reviews (FR-007)
+// -------------------------------------------------------------
+export const reviewsApi = {
+  async list(productId: string) {
+    return request<{ success: boolean; data: any[] }>(`/reviews?productId=${encodeURIComponent(productId)}`)
+  },
+
+  async create(productId: string, rating: number, comment: string) {
+    return request<{ success: boolean; message: string; data: any }>('/reviews', {
+      method: 'POST',
+      body: JSON.stringify({ productId, rating, comment }),
     })
   },
 }

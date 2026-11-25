@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { authApi } from '../../lib/api'
 
 const navItems = [
   {
@@ -70,7 +71,35 @@ interface SidebarProps {
   onNavigate?: () => void
 }
 
+const plainButton = {
+  background: 'none',
+  border: 0,
+  width: '100%',
+  cursor: 'pointer',
+  textAlign: 'left' as const,
+  font: 'inherit',
+}
+
 export default function Sidebar({ isOpen = false, onNavigate }: SidebarProps) {
+  const navigate = useNavigate()
+  const user: any = authApi.getUser()
+  const name = String(user?.name ?? 'Admin')
+  const initials =
+    name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase() || 'A'
+
+  function logout() {
+    authApi.logout()
+    window.localStorage.removeItem('rigcraft-auth')
+    onNavigate?.()
+    navigate('/masuk')
+  }
+
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       {/* Logo */}
@@ -99,14 +128,30 @@ export default function Sidebar({ isOpen = false, onNavigate }: SidebarProps) {
             {item.label}
           </NavLink>
         ))}
+
+        <Link className="sidebar-link" to="/" onClick={onNavigate}>
+          <svg viewBox="0 0 24 24">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <path d="M9 22V12h6v10" />
+          </svg>
+          Lihat Toko
+        </Link>
+
+        <button className="sidebar-link" type="button" style={plainButton} onClick={logout}>
+          <svg viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+            <path d="M16 17l5-5-5-5M21 12H9" />
+          </svg>
+          Keluar
+        </button>
       </nav>
 
       {/* User */}
       <div className="sidebar-user">
-        <div className="sidebar-user-avatar">AR</div>
+        <div className="sidebar-user-avatar">{initials}</div>
         <div className="sidebar-user-info">
-          <span className="sidebar-user-name">Admin RigCraft</span>
-          <span className="sidebar-user-role">Super Admin</span>
+          <span className="sidebar-user-name">{name}</span>
+          <span className="sidebar-user-role">{user?.role === 'admin' ? 'Administrator' : String(user?.role ?? 'Pengguna')}</span>
         </div>
       </div>
     </aside>

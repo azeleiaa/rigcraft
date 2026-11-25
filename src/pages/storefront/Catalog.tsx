@@ -1,10 +1,48 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { componentProducts } from '../../storefront/data'
+import { productsApi } from '../../lib/api'
 import { ProductCard, StoreBreadcrumb, StoreIcon } from '../../storefront/StorefrontUI'
 
-const categories = ['CPU (Processor)', 'GPU (VGA Card)', 'Motherboard', 'RAM (Memory)', 'SSD & HDD Storage', 'Power Supply (PSU)', 'Cooling', 'Casing']
-const brands = ['Intel', 'AMD', 'NVIDIA', 'ASUS', 'MSI', 'Corsair', 'Samsung']
+// label = teks di filter, keys = kata kunci yang dicocokkan ke category dari backend
+const categories = [
+  { label: 'CPU (Processor)', keys: ['cpu', 'processor'] },
+  { label: 'GPU (VGA Card)', keys: ['gpu', 'vga'] },
+  { label: 'Motherboard', keys: ['motherboard', 'mobo'] },
+  { label: 'RAM (Memory)', keys: ['ram', 'memory'] },
+  { label: 'SSD & HDD Storage', keys: ['ssd', 'hdd', 'storage'] },
+  { label: 'Power Supply (PSU)', keys: ['psu', 'power'] },
+  { label: 'Cooling', keys: ['cooling', 'cooler'] },
+  { label: 'Casing', keys: ['casing', 'case'] },
+]
+const PAGE_SIZE = 12
+
+function buildDescription(p: any): string {
+  if (p.description) return String(p.description)
+  const specs = p.specs && typeof p.specs === 'object' ? p.specs : {}
+  const parts = Object.entries(specs)
+    .filter(([, v]) => typeof v === 'string' || typeof v === 'number')
+    .map(([k, v]) => (k === 'powerWattage' ? `${v}W` : String(v)))
+  return parts.slice(0, 4).join(' · ')
+}
+
+// Ubah bentuk data backend agar cocok dengan yang dibaca ProductCard
+function mapProduct(p: any) {
+  const id = String(p._id ?? p.id ?? '')
+  const hasStock = p.stock === undefined || p.stock === null || Number(p.stock) > 0
+  const isActive = p.status === undefined || p.status === 'Aktif' || p.status === 'Tersedia'
+  return {
+    ...p,
+    id,
+    slug: id,
+    name: p.name ?? '',
+    description: buildDescription(p),
+    category: p.category ?? '',
+    brand: p.brand ?? '',
+    price: Number(p.price ?? 0),
+    image: p.image ?? p.image_url ?? '',
+    status: isActive && hasStock ? 'Tersedia' : 'Habis',
+  }
+}
 
 export default function Catalog() {
   const [params] = useSearchParams()
@@ -13,20 +51,63 @@ export default function Catalog() {
   const [maximumPrice, setMaximumPrice] = useState('50000000')
   const [sort, setSort] = useState('lowest')
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [products, setProducts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const selectedCategory = params.get('kategori')
 
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      setError('')
+      try {
+        const res = await productsApi.getAll({ type: 'sparepart', per_page: 100 })
+        if (cancelled) return
+        const list = (res.data ?? [])
+          .filter((p: any) => p.type !== 'prebuilt_pc')
+          .map(mapProduct)
+        setProducts(list)
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Gagal memuat produk.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  // Daftar brand diambil dari data yang benar-benar ada
+  const brands = useMemo(
+    () => Array.from(new Set(products.map((p) => p.brand).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
+    [products],
+  )
+
   const visibleProducts = useMemo(() => {
-    const filtered = componentProducts.filter((product) => {
-      const searchText = `${product.name} ${product.description} ${product.category}`.toLowerCase()
+    const filtered = products.filter((product) => {
+      const category = String(product.category).toLowerCase()
+      const searchText = `${product.name} ${product.description} ${product.category} ${product.brand}`.toLowerCase()
       const matchesSearch = searchText.includes(query.trim().toLowerCase())
       const matchesPrice = product.price <= Number(maximumPrice || 0)
-      const matchesCategory = activeCategories.length === 0 || activeCategories.some((category) => product.category.toLowerCase().includes(category.split(' ')[0].toLowerCase()))
-      const matchesSelected = !selectedCategory || product.category.toLowerCase().includes(selectedCategory.toLowerCase().replace('vga', 'gpu'))
-      const matchesBrand = activeBrands.length === 0 || activeBrands.some((brand) => product.name.toLowerCase().includes(brand.toLowerCase()))
+      const matchesCategory =
+        activeCategories.length === 0 ||
+        categories.some((c) => activeCategories.includes(c.label) && c.keys.some((k) => category.includes(k)))
+      const wanted = selectedCategory?.toLowerCase().replace('vga', 'gpu')
+      const matchesSelected = !wanted || category.includes(wanted) || categories.some((c) => c.keys.includes(wanted) && c.keys.some((k) => category.includes(k)))
+      const matchesBrand = activeBrands.length === 0 || activeBrands.includes(product.brand)
       return matchesSearch && matchesPrice && matchesCategory && matchesSelected && matchesBrand
     })
-    return filtered.sort((left, right) => sort === 'highest' ? right.price - left.price : left.price - right.price)
-  }, [activeBrands, activeCategories, maximumPrice, query, selectedCategory, sort])
+    return [...filtered].sort((left, right) => sort === 'highest' ? right.price - left.price : left.price - right.price)
+  }, [products, activeBrands, activeCategories, maximumPrice, query, selectedCategory, sort])
+
+  const totalPages = Math.max(1, Math.ceil(visibleProducts.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pagedProducts = visibleProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  // Kembali ke halaman 1 setiap filter berubah
+  useEffect(() => { setPage(1) }, [activeBrands, activeCategories, maximumPrice, query, selectedCategory, sort])
 
   function toggleFilter(value: string, current: string[], update: (next: string[]) => void) {
     update(current.includes(value) ? current.filter((item) => item !== value) : [...current, value])
@@ -67,9 +148,9 @@ export default function Catalog() {
           <fieldset>
             <legend>Kategori</legend>
             {categories.map((category) => (
-              <label className="sf-check-row" key={category}>
-                <input type="checkbox" checked={activeCategories.includes(category)} onChange={() => toggleFilter(category, activeCategories, setActiveCategories)} />
-                <span>{category}</span>
+              <label className="sf-check-row" key={category.label}>
+                <input type="checkbox" checked={activeCategories.includes(category.label)} onChange={() => toggleFilter(category.label, activeCategories, setActiveCategories)} />
+                <span>{category.label}</span>
               </label>
             ))}
           </fieldset>
@@ -96,7 +177,7 @@ export default function Catalog() {
 
         <div className="sf-catalog-results">
           <div className="sf-catalog-toolbar">
-            <p>Menampilkan <strong>{visibleProducts.length}</strong> komponen</p>
+            <p>Menampilkan <strong>{loading ? '...' : visibleProducts.length}</strong> komponen</p>
             <label>Urutkan
               <select value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option value="lowest">Harga Terendah</option>
@@ -104,16 +185,28 @@ export default function Catalog() {
               </select>
             </label>
           </div>
-          {visibleProducts.length
-            ? <div className="sf-product-grid sf-catalog-grid">{visibleProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div>
-            : <div className="sf-empty-results"><StoreIcon name="search" /><h2>Komponen tidak ditemukan</h2><p>Coba ubah kata kunci, kategori, brand, atau kisaran harga.</p></div>}
-          <nav className="sf-pagination" aria-label="Halaman katalog">
-            <button disabled aria-label="Halaman sebelumnya">‹</button>
-            <button className="is-current" aria-current="page">1</button>
-            <button disabled>2</button>
-            <button disabled>3</button>
-            <button disabled aria-label="Halaman berikutnya">›</button>
-          </nav>
+
+          {loading && (
+            <div className="sf-empty-results"><StoreIcon name="search" /><h2>Memuat produk...</h2><p>Server mungkin butuh beberapa detik jika baru bangun.</p></div>
+          )}
+
+          {!loading && error && (
+            <div className="sf-empty-results"><StoreIcon name="search" /><h2>Gagal memuat produk</h2><p>{error}</p></div>
+          )}
+
+          {!loading && !error && (pagedProducts.length
+            ? <div className="sf-product-grid sf-catalog-grid">{pagedProducts.map((product) => <ProductCard product={product} key={product.slug} />)}</div>
+            : <div className="sf-empty-results"><StoreIcon name="search" /><h2>Komponen tidak ditemukan</h2><p>Coba ubah kata kunci, kategori, brand, atau kisaran harga.</p></div>)}
+
+          {!loading && !error && totalPages > 1 && (
+            <nav className="sf-pagination" aria-label="Halaman katalog">
+              <button disabled={currentPage === 1} aria-label="Halaman sebelumnya" onClick={() => setPage(currentPage - 1)}>‹</button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button key={n} className={n === currentPage ? 'is-current' : ''} aria-current={n === currentPage ? 'page' : undefined} onClick={() => setPage(n)}>{n}</button>
+              ))}
+              <button disabled={currentPage === totalPages} aria-label="Halaman berikutnya" onClick={() => setPage(currentPage + 1)}>›</button>
+            </nav>
+          )}
         </div>
       </section>
     </>

@@ -16,11 +16,15 @@ import Cart from './pages/storefront/Cart'
 import Checkout from './pages/storefront/Checkout'
 import Auth from './pages/storefront/Auth'
 import About from './pages/storefront/About'
+import { authApi } from './lib/api'
 
 function RequireAdminAuth() {
   const location = useLocation()
-  const isAuth = window.localStorage.getItem('rigcraft-auth') === 'true'
-  if (!isAuth) return <Navigate to="/masuk" state={{ from: location.pathname }} replace />
+  const token = authApi.getToken()
+  const user = authApi.getUser()
+  if (!token || user?.role !== 'admin') {
+    return <Navigate to="/masuk" state={{ from: location.pathname }} replace />
+  }
   return <Outlet />
 }
 

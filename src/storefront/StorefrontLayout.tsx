@@ -1,32 +1,75 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { authApi, voucherApi } from '../lib/api'
 import type { StoreProduct } from './data'
 import './storefront.css'
 
+export type CartProduct = StoreProduct & { type?: string }
+
 export interface CartItem {
-  product: StoreProduct
+  product: CartProduct
   quantity: number
+}
+
+export interface AppliedVoucher {
+  code: string
+  discount: number
 }
 
 interface StoreContextValue {
   items: CartItem[]
   count: number
   subtotal: number
+  voucher: AppliedVoucher | null
   addToCart: (product: StoreProduct, quantity?: number) => void
   setQuantity: (slug: string, quantity: number) => void
   removeFromCart: (slug: string) => void
   clearCart: () => void
+  applyVoucher: (code: string) => Promise<string>
+  removeVoucher: () => void
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null)
 
+// Kunci baru: membuang keranjang lama yang berisi data dummy
+const CART_KEY = 'rigcraft-store-cart-v2'
+
+// Hanya produk dari database (ID Mongo 24 karakter hex) yang bisa dipesan lewat API
+export function isOrderable(product: StoreProduct) {
+  return /^[a-f\d]{24}$/i.test(product.slug)
+}
+
 function loadCart(): CartItem[] {
   try {
-    const saved = window.localStorage.getItem('rigcraft-store-cart')
-    return saved ? JSON.parse(saved) as CartItem[] : []
+    window.localStorage.removeItem('rigcraft-store-cart')
+    const saved = window.localStorage.getItem(CART_KEY)
+    const parsed = saved ? JSON.parse(saved) : []
+    if (!Array.isArray(parsed)) return []
+    return (parsed as CartItem[]).filter((item) => item?.product?.slug && item.quantity > 0)
   } catch {
     return []
   }
+}
+
+// Simpan field yang dibutuhkan saja agar localStorage tidak membengkak
+function toCartProduct(product: StoreProduct): CartProduct {
+  return {
+    slug: product.slug,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    description: product.description,
+    image: product.image,
+    status: product.status,
+    type: (product as { type?: string }).type,
+  }
+}
+
+function discountFrom(data: { discountPercentage?: number; discountAmount?: number }, subtotal: number) {
+  const amount = Number(data.discountAmount ?? 0)
+  if (amount > 0) return Math.min(amount, subtotal)
+  const percentage = Number(data.discountPercentage ?? 0)
+  return Math.min(Math.round((subtotal * percentage) / 100), subtotal)
 }
 
 export function useStoreCart() {
@@ -41,9 +84,22 @@ function BrandMark() {
 
 function StoreHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [, setTick] = useState(0)
   const location = useLocation()
+  const navigate = useNavigate()
   const { count } = useStoreCart()
   useEffect(() => setMenuOpen(false), [location.pathname])
+
+  // Dibaca setiap render; header ikut render ulang saat rute berubah
+  const user: any = authApi.getToken() ? authApi.getUser() : null
+
+  function logout() {
+    authApi.logout()
+    window.localStorage.removeItem('rigcraft-auth')
+    setMenuOpen(false)
+    setTick((value) => value + 1)
+    navigate('/')
+  }
 
   const links = [
     { to: '/', label: 'Beranda', end: true },
@@ -62,8 +118,18 @@ function StoreHeader() {
           {links.map((link) => <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => `sf-nav-link ${isActive ? 'is-active' : ''}`}>{link.label}</NavLink>)}
         </nav>
         <div className="sf-header-actions">
-          <Link className="sf-sign-in" to="/masuk">Masuk</Link>
-          <Link className="sf-button sf-button-small" to="/daftar">Daftar</Link>
+          {user ? (
+            <>
+              {user.role === 'admin' && <Link className="sf-sign-in" to="/dashboard">Dashboard</Link>}
+              <span className="sf-sign-in" title={user.email}>Halo, {String(user.name ?? 'Pengguna').split(' ')[0]}</span>
+              <button className="sf-sign-in" type="button" onClick={logout}>Keluar</button>
+            </>
+          ) : (
+            <>
+              <Link className="sf-sign-in" to="/masuk">Masuk</Link>
+              <Link className="sf-button sf-button-small" to="/daftar">Daftar</Link>
+            </>
+          )}
           <Link className="sf-cart-link" to="/keranjang" aria-label="Keranjang belanja"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.3a2 2 0 0 0 2-1.6L21 8H6" /><circle cx="10" cy="21" r="1" /><circle cx="18" cy="21" r="1" /></svg><span>Keranjang</span>{count > 0 && <span className="sf-cart-badge" aria-label={`${count} item`}>{count > 99 ? '99+' : count}</span>}</Link>
         </div>
       </div>
@@ -86,13 +152,38 @@ function StoreFooter() {
 
 export default function StorefrontLayout() {
   const [items, setItems] = useState<CartItem[]>(loadCart)
-  useEffect(() => window.localStorage.setItem('rigcraft-store-cart', JSON.stringify(items)), [items])
+  const [voucher, setVoucher] = useState<AppliedVoucher | null>(null)
+  const subtotal = items.reduce((total, item) => total + item.product.price * item.quantity, 0)
+
+  useEffect(() => {
+    window.localStorage.setItem(CART_KEY, JSON.stringify(items))
+  }, [items])
+
+  // Subtotal berubah: cek ulang voucher ke server (syarat minimal belanja bisa tidak terpenuhi lagi)
+  useEffect(() => {
+    if (!voucher) return
+    if (subtotal <= 0) {
+      setVoucher(null)
+      return
+    }
+    let cancelled = false
+    voucherApi
+      .validate(voucher.code, subtotal)
+      .then((res) => {
+        if (!cancelled) setVoucher({ code: res.data.code, discount: discountFrom(res.data, subtotal) })
+      })
+      .catch(() => {
+        if (!cancelled) setVoucher(null)
+      })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal])
 
   function addToCart(product: StoreProduct, quantity = 1) {
     setItems((current) => {
       const existing = current.find((item) => item.product.slug === product.slug)
       if (existing) return current.map((item) => item.product.slug === product.slug ? { ...item, quantity: item.quantity + quantity } : item)
-      return [...current, { product, quantity }]
+      return [...current, { product: toCartProduct(product), quantity }]
     })
   }
 
@@ -105,14 +196,32 @@ export default function StorefrontLayout() {
     setItems((current) => current.filter((item) => item.product.slug !== slug))
   }
 
+  async function applyVoucher(code: string) {
+    if (subtotal <= 0) throw new Error('Keranjang masih kosong.')
+    try {
+      const res = await voucherApi.validate(code.trim().toUpperCase(), subtotal)
+      setVoucher({ code: res.data.code, discount: discountFrom(res.data, subtotal) })
+      return res.message || 'Voucher berhasil diterapkan.'
+    } catch (error) {
+      setVoucher(null)
+      throw error
+    }
+  }
+
   const value: StoreContextValue = {
     items,
     count: items.reduce((total, item) => total + item.quantity, 0),
-    subtotal: items.reduce((total, item) => total + item.product.price * item.quantity, 0),
+    subtotal,
+    voucher,
     addToCart,
     setQuantity,
     removeFromCart,
-    clearCart: () => setItems([]),
+    clearCart: () => {
+      setItems([])
+      setVoucher(null)
+    },
+    applyVoucher,
+    removeVoucher: () => setVoucher(null),
   }
 
   return (
