@@ -83,6 +83,7 @@ export const authApi = {
 export const productsApi = {
   async getAll(params: {
     q?: string
+    search?: string
     category?: string
     type?: string
     brand?: string
@@ -93,6 +94,7 @@ export const productsApi = {
     sort?: string
     page?: number
     per_page?: number
+    limit?: number
   } = {}) {
     const query = new URLSearchParams()
     Object.entries(params).forEach(([k, v]) => {
@@ -194,6 +196,13 @@ export const cartApi = {
     })
   },
 
+  async update(productId: string, quantity: number) {
+    return request<{ success: boolean; message: string }>(`/cart/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+    })
+  },
+
   async clear() {
     return request<{ success: boolean; message: string }>('/cart', {
       method: 'DELETE',
@@ -221,6 +230,29 @@ export const ordersApi = {
 
   async getMyOrders() {
     return request<{ success: boolean; data: any[] }>('/orders')
+  },
+
+  async cancelOrder(id: string) {
+    return request<{ success: boolean; message: string; data: any }>(`/orders/${id}/cancel`, {
+      method: 'PUT',
+    })
+  },
+}
+
+// -------------------------------------------------------------
+// Reviews (FR-007)
+// -------------------------------------------------------------
+export const reviewsApi = {
+  async list(productId?: string) {
+    const qs = productId ? `?productId=${encodeURIComponent(productId)}` : ''
+    return request<{ success: boolean; count: number; data: any[] }>(`/reviews${qs}`)
+  },
+
+  async submit(productId: string, rating: number, comment: string) {
+    return request<{ success: boolean; message: string; data: any }>('/reviews', {
+      method: 'POST',
+      body: JSON.stringify({ productId, rating, comment }),
+    })
   },
 }
 
@@ -256,8 +288,9 @@ export const adminApi = {
     })
   },
 
-  async getOrders() {
-    return request<{ success: boolean; data: any[] }>('/admin/orders')
+  async getOrders(status?: string) {
+    const qs = status ? `?status=${encodeURIComponent(status)}` : ''
+    return request<{ success: boolean; count?: number; data: any[] }>(`/admin/orders${qs}`)
   },
 
   async updateOrderStatus(id: string, status: string) {
@@ -266,20 +299,33 @@ export const adminApi = {
       body: JSON.stringify({ status }),
     })
   },
-}
 
-// -------------------------------------------------------------
-// Reviews (FR-007)
-// -------------------------------------------------------------
-export const reviewsApi = {
-  async list(productId: string) {
-    return request<{ success: boolean; data: any[] }>(`/reviews?productId=${encodeURIComponent(productId)}`)
+  async getReviews(productId?: string) {
+    const qs = productId ? `?productId=${encodeURIComponent(productId)}` : ''
+    return request<{ success: boolean; count: number; data: any[] }>(`/admin/reviews${qs}`)
   },
 
-  async create(productId: string, rating: number, comment: string) {
-    return request<{ success: boolean; message: string; data: any }>('/reviews', {
+  async getVouchers() {
+    return request<{ success: boolean; count: number; data: any[] }>('/admin/vouchers')
+  },
+
+  async createVoucher(voucher: any) {
+    return request<{ success: boolean; message: string; data: any }>('/admin/vouchers', {
       method: 'POST',
-      body: JSON.stringify({ productId, rating, comment }),
+      body: JSON.stringify(voucher),
+    })
+  },
+
+  async updateVoucher(id: string, voucher: any) {
+    return request<{ success: boolean; message: string; data: any }>(`/admin/vouchers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(voucher),
+    })
+  },
+
+  async deleteVoucher(id: string) {
+    return request<{ success: boolean; message: string }>(`/admin/vouchers/${id}`, {
+      method: 'DELETE',
     })
   },
 }

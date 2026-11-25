@@ -4,7 +4,7 @@
 
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Demo-brightgreen?logo=vercel)](https://rigcraft-ebon.vercel.app)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-blue?logo=react)](https://react.dev/)
-[![Laravel](https://img.shields.io/badge/Backend-Laravel%2011%20API-red?logo=laravel)](https://laravel.com/)
+[![Laravel](https://img.shields.io/badge/Backend-Laravel%2013%20API-red?logo=laravel)](https://laravel.com/)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas%20NoSQL-green?logo=mongodb)](https://www.mongodb.com/atlas)
 [![JWT](https://img.shields.io/badge/Auth-JWT%20Bearer%20Tokens-purple)](https://jwt.io/)
 
@@ -29,8 +29,9 @@ Sistem menggunakan pendekatan **Decoupled Architecture** (pemisahan penuh layer 
 |          FRONTEND LAYER            |              |           BACKEND LAYER            |
 |       React.js + TypeScript        |  HTTP REST   |        Laravel 13 REST API         |
 |   (Desktop, Tablet & Mobile UI)    |<============>|    (JWT Auth + Rule Validation)    |
-|    Hosted: Vercel (Production)     |  (JSON/JWT)  |     Directory: api/                |
-+------------------------------------+              +-----------------+------------------+
+|    Hosted: Vercel (Production)     |  (JSON/JWT)  | Repo: azeleiaa/rigcraft-api        |
++------------------------------------+              |     Hosted: Railway (Production)   |
+                                                    +-----------------+------------------+
                                                                       |
                                                                       | mongodb/laravel-mongodb
                                                                       v
@@ -104,23 +105,35 @@ Base URL Lokal: `http://localhost:8000/api/v1`
 | `POST` | `/api/v1/auth/login` | Publik | Login & generate JWT Token (FR-001) |
 | `GET` | `/api/v1/auth/me` | JWT | Profil pengguna aktif |
 | `POST` | `/api/v1/auth/logout` | JWT | Invalidate token pengguna |
-| `GET` | `/api/v1/products` | Publik | Katalog produk dengan filter NoSQL (kategori, brand, harga) (FR-003) |
+| `GET` | `/api/v1/products` | Publik | Katalog produk dengan filter NoSQL (kategori, brand, harga, `socket`, `ramType`) + paginasi `meta` (FR-003) |
 | `GET` | `/api/v1/products/{id}` | Publik | Rincian produk & embedded benchmark FPS (FR-005) |
-| `POST` | `/api/v1/builder/validate` | Publik | **Rule-Based Compatibility Validation** (Socket CPU vs Mobo, RAM DDR4/DDR5, Wattage vs PSU) (FR-004) |
+| `POST` | `/api/v1/builder/validate` | Publik | **Rule-Based Compatibility Validation** (Socket CPU vs Mobo, RAM DDR4/DDR5, Wattage max 80% PSU) (FR-004) |
 | `POST` | `/api/v1/vouchers/validate`| Publik | Validasi kupon promo (`RIGCRAFT2026`, `HEMAT10`, dll.) |
+| `GET` | `/api/health` | Publik | Health check produksi (200 + flag env, tanpa DB/session) |
+| `GET` | `/api/v1/reviews?productId=` | Publik | Daftar ulasan produk (FR-007) |
 | `GET` | `/api/v1/cart` | JWT | Ambil data keranjang belanja (FR-006) |
 | `POST` | `/api/v1/cart` | JWT | Tambah item ke keranjang (FR-006) |
+| `PUT` | `/api/v1/cart/{productId}` | JWT | Ubah jumlah item (0 = hapus) |
 | `DELETE`| `/api/v1/cart/{productId}`| JWT | Hapus item dari keranjang |
 | `DELETE`| `/api/v1/cart` | JWT | Kosongkan keranjang |
 | `POST` | `/api/v1/orders` | JWT | Checkout transaksi baru (FR-006) |
 | `GET` | `/api/v1/orders` | JWT | Riwayat pesanan customer |
+| `PUT` | `/api/v1/orders/{id}/cancel` | JWT | Batalkan pesanan sendiri (hanya Diproses/Menunggu Pembayaran) |
+| `POST` | `/api/v1/reviews` | JWT | Kirim ulasan produk (rating 1-5) |
 | `GET` | `/api/v1/admin/stats` | Admin | **Agregasi MongoDB**: Pendapatan, total pesanan, grafik, status pesanan (FR-007) |
 | `GET` | `/api/v1/admin/products`| Admin | Daftar seluruh produk (termasuk status Draft) |
 | `POST` | `/api/v1/admin/products`| Admin | Tambah produk & embedded document baru (FR-002) |
 | `PUT` | `/api/v1/admin/products/{id}`| Admin| Update data produk & embedded specs (FR-002) |
 | `DELETE`| `/api/v1/admin/products/{id}`| Admin| Hapus dokumen produk (FR-002) |
-| `GET` | `/api/v1/admin/orders` | Admin | Seluruh riwayat transaksi pelanggan |
+| `GET` | `/api/v1/admin/orders` | Admin | Seluruh riwayat transaksi pelanggan (`?status=`) |
 | `PUT` | `/api/v1/admin/orders/{id}` | Admin | Update status pesanan (Diproses / Dikirim / Selesai / Dibatalkan) |
+| `GET` | `/api/v1/admin/vouchers` | Admin | Daftar voucher promo |
+| `POST` | `/api/v1/admin/vouchers` | Admin | Tambah voucher baru |
+| `PUT` | `/api/v1/admin/vouchers/{id}` | Admin | Edit voucher |
+| `DELETE`| `/api/v1/admin/vouchers/{id}` | Admin | Hapus voucher |
+| `GET` | `/api/v1/admin/reviews` | Admin | Baca ulasan pelanggan |
+
+Koleksi Postman lengkap (30 endpoint + contoh body): `../rigcraft-api/postman/RigCraft-API.postman_collection.json`.
 
 ---
 
@@ -128,7 +141,7 @@ Base URL Lokal: `http://localhost:8000/api/v1`
 
 ### 1. Prasyarat Sistem
 - **Node.js**: v18+ (disarankan Node.js 20+)
-- **PHP**: v8.3+ (termasuk ekstensi `mongodb`, `openssl`, `mbstring`, `zip`)
+- **PHP**: v8.4+ (lock file membutuhkan `php >=8.4.1`; termasuk ekstensi `mongodb`, `openssl`, `mbstring`, `zip`)
 - **Composer**: v2+
 - **MongoDB**: Akun MongoDB Atlas (Cloud) atau MongoDB Community lokal
 
@@ -160,8 +173,11 @@ Helper API terpusat tersedia di `src/lib/api.ts` (`authApi`, `productsApi`, `bui
 
 ### 3. Menjalankan Backend Lokal (Laravel API)
 
+> Backend aktif dikembangkan di repository terpisah: **[azeleiaa/rigcraft-api](https://github.com/azeleiaa/rigcraft-api)**.
+> Folder `api/` di repo ini adalah salinan lama (legacy) dan tidak lagi dipakai — jangan kembangkan di sana.
+
 ```powershell
-cd C:\Projects\rigcraft\api
+cd C:\Projects\rigcraft-api
 composer install
 Copy-Item .env.example .env
 php artisan key:generate
@@ -172,19 +188,20 @@ php artisan jwt:secret
 php artisan test
 php artisan serve --host 0.0.0.0 --port 8000
 ```
-API lokal berjalan di `http://localhost:8000`. Endpoint health check: `http://localhost:8000/up`.
+API lokal berjalan di `http://localhost:8000`. Endpoint health check: `http://localhost:8000/api/health`.
 
-### 4. Deploy Backend ke Render Free untuk Demo Vercel
+### 4. Deploy Backend ke Railway untuk Demo Vercel
 
-1. Pastikan perubahan repository ini sudah di-push ke GitHub.
-2. Di Render, buat **New → Blueprint** dari repository `azeleiaa/rigcraft`; Render akan membaca `render.yaml` dan membangun service `rigcraft-api` dari folder `api/`.
-3. Isi nilai rahasia yang diminta Blueprint di Render:
+1. Pastikan perubahan repository `azeleiaa/rigcraft-api` sudah di-push ke GitHub (`main` auto-deploy).
+2. Railway membaca `Dockerfile` (PHP 8.4 + Apache + ekstensi MongoDB prebuilt) dan menjalankan entrypoint yang mengarahkan Apache ke `$PORT`.
+3. Isi environment variables di Railway:
    - `APP_KEY` — buat key baru dengan `php artisan key:generate --show`.
-   - `MONGODB_URI` — URI MongoDB Atlas untuk database demo `rigcraft_demo`.
-   - `JWT_SECRET` — buat secret random baru; jangan commit atau bagikan nilainya.
-4. Di MongoDB Atlas, pastikan user database demo boleh terhubung dari Render. Batasi user hanya ke database demo dan jangan gunakan kredensial database yang dipakai bersama.
-5. Setelah deploy, tunggu status **Live**, lalu uji `https://<domain-render>/up`. Render Free menidurkan service setelah 15 menit tidak aktif; request pertama berikutnya bisa memerlukan sekitar satu menit.
-6. Kirim URL API `https://<domain-render>/api/v1` ke tim frontend agar mereka dapat mengatur `VITE_API_URL` di Vercel dan menghubungkan halaman aplikasi.
+   - `MONGODB_URI` — URI MongoDB Atlas untuk database demo.
+   - `JWT_SECRET` — buat secret baru dengan `php artisan jwt:secret`; jangan commit atau bagikan nilainya.
+   - Wajib juga: `CACHE_STORE=file`, `SESSION_DRIVER=file` (cache `database` tidak didukung driver MongoDB dan membuat login/register 500), `LOG_CHANNEL=stderr`.
+4. Di MongoDB Atlas, pastikan user database demo boleh terhubung dari Railway (`0.0.0.0/0` untuk tahap development). Batasi user hanya ke database demo dan jangan gunakan kredensial database yang dipakai bersama.
+5. Setelah deploy, tunggu status **Live**, lalu uji `https://<domain-railway>/api/health` (harus 200 + flag env `true`).
+6. Kirim URL API `https://<domain-railway>/api/v1` ke tim frontend agar mereka dapat mengatur `VITE_API_URL` di Vercel dan menghubungkan halaman aplikasi.
 
 Jangan gunakan database bersama untuk demo: seeder menjalankan `truncate` pada koleksi user, produk, voucher, dan order.
 
@@ -213,6 +230,9 @@ Dibuat otomatis oleh `php artisan db:seed`:
   - `HEMAT10` (Diskon 10%, Min. belanja Rp 2.000.000)
   - `PCBARU` (Potongan Rp 500.000, Min. belanja Rp 10.000.000)
 
+> ⚠️ Kredensial di atas adalah akun demo untuk development & UAS dan sengaja dipublikasikan agar tim/dosen bisa login.
+> Karena seeder membuat akun yang sama di database produksi, **ganti password admin produksi** setelah deploy dan jangan gunakan kredensial demo untuk data sungguhan.
+
 ---
 
 ## 📂 Struktur Repositori (Project Structure)
@@ -233,22 +253,7 @@ c:\Projects\
 │   ├── vercel.json                    # Konfigurasi SPA routing rewrite untuk Vercel
 │   └── package.json
 │
-├── api/                                # Layer Backend (Laravel 13 + MongoDB NoSQL)
-    ├── app/
-    │   ├── Http/
-    │   │   ├── Controllers/Api/       # AuthController, ProductController, BuilderController, CartController, OrderController, AdminController
-    │   │   └── Middleware/            # EnsureAdmin.php (Admin Role Guard)
-    │   └── Models/                    # User.php, Product.php, Order.php, Cart.php, Voucher.php, Review.php (MongoDB Eloquent)
-    ├── config/
-    │   ├── auth.php                   # Guard api => driver: jwt
-    │   ├── database.php               # Driver mongodb
-    │   ├── cors.php                   # Konfigurasi CORS frontend
-    │   └── jwt.php                    # Konfigurasi JWT token & TTL
-    ├── database/
-    │   └── seeders/DatabaseSeeder.php # Seeder produk, user, voucher, index NoSQL
-    ├── routes/
-    │   └── api.php                    # 21 REST API Endpoints (/api/v1/...)
-    ├── tests/
-    │   └── Feature/RigCraftApiTest.php# Pengujian PHPUnit untuk SRS §4
-    └── .env.example                   # Template konfigurasi; secret disimpan di .env lokal
+├── api/                                # ⚠️ LEGACY — salinan lama backend, tidak dipakai lagi.
+                                     # Backend aktif ada di repo terpisah: azeleiaa/rigcraft-api
+                                     # (Laravel 13 + Dockerfile + Railway deploy, 30 endpoint)
 ```
